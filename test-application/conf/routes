@@ -1,0 +1,16 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                                       LocalizedApplication.hello
+POST    /hello                                  LocalizedApplication.hello
+POST    /helloWithType                          LocalizedApplication.helloWithType
+
+# Map static resources from the /app/public folder to the /public path
+GET     /public/                                staticDir:public
+
+*     /                       module:play-messages
+
+# Catch all
+*       /{controller}/{action}                  {controller}.{action}

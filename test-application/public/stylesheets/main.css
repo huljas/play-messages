@@ -1,0 +1,33 @@
+body {
+    background-color: #6682a2;
+    font-family: arial;
+    font-size: 14px;
+}
+
+.section {
+    -moz-border-radius: 5px 5px 5px 5px;
+    background-color: #73A1C2;
+    border: 3px solid #FFF9E8;
+    color: white;
+    padding: 5px;
+    margin: 5px auto;
+    width: 800px;
+}
+
+.hello {
+    background-color: #FFFFFF;
+    border-color: #333355;
+    color: #333333;
+    font-size: 300%;
+    padding: 11px;
+    width: 788px;
+}
+
+label {
+    display: block;
+}
+
+.lang-select a {
+    color: #C6E6FF;
+    text-transform: uppercase;
+}
