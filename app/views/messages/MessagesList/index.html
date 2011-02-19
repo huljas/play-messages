@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="${lang}">
+<head>
+    <title>@messages</title>
+    <meta charset="utf-8"/>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
+<style>
+.ui-tabs { position: relative; padding: .2em; zoom: 1; } /* position: relative prevents IE scroll bug (element with position: relative inside container with overflow: auto appear as "fixed") */
+.ui-tabs .ui-tabs-nav { margin: 0; padding: .2em .2em 0; }
+.ui-tabs .ui-tabs-nav li { list-style: none; float: left; position: relative; top: 1px; margin: 0 .2em 1px 0; border-bottom: 0 !important; padding: 0; white-space: nowrap; }
+.ui-tabs .ui-tabs-nav li a { float: left; padding: .5em 1em; text-decoration: none; }
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected { margin-bottom: 0; padding-bottom: 1px; }
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected a, .ui-tabs .ui-tabs-nav li.ui-state-disabled a, .ui-tabs .ui-tabs-nav li.ui-state-processing a { cursor: text; }
+.ui-tabs .ui-tabs-nav li a, .ui-tabs.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a { cursor: pointer; } /* first selector in group seems obsolete, but required to overcome bug in Opera applying cursor: text overall if defined elsewhere... */
+.ui-tabs .ui-tabs-panel { display: block; border-width: 0; padding: 1em 1.4em; background: none; }
+.ui-tabs .ui-tabs-hide { display: none !important; }
+</style>
+
+</head>
+<body>
+<div id="wrap">
+#{if flash.error}
+    <span class="error">${flash.error}</span>
+#{/if}
+
+<h3>Selected language '${language}', change to ...
+#{list items:play.langs,as:'langOption'}
+<a href="@{index(langOption)}" #{if langOption == language}class="selected"#{/if}>${langOption}</a>
+#{/list}
+</h3>
+<h4>
+#{if workingFile.exists()}
+Read localization from working file ${workingFile.getPath()}.
+#{/if}
+#{else}
+Using default Play messages.
+#{/else}
+</h4>
+#{form @save()}
+
+<div id="tabs">
+    <ul>
+        <li><a href="#tab-1">New keys (${newKeys.size()})</a></li>
+        <li><a href="#tab-2">Existing (${existingKeys.size()})</a></li>
+        <li><a href="#tab-3">Obsolete (${obsoleteKeys.size()})</a></li>
+    </ul>
+        <input type="hidden" name="language" value="${language}"/>
+
+        <div id="tab-1">
+            <h3>New keys</h3>
+            <table id="new-keys">
+                <thead>
+                <tr>
+                    <th>Key</th>
+                    <th>Value</th>
+                    <th>Ignore</th>
+                </tr>
+                </thead>
+                <tbody>
+                #{list items:newKeys.sort(),as:'key'}
+                #{ifnot ignoreList.contains(key)}
+                <tr>
+                    <td class="key"><label>${key}</label><br><em>${sources.getSources(key).nl2br()}</em></td>
+                    <td class="message"><textarea rows="3" cols="40" name="values[${key}]"></textarea></td>
+                    <td><input type="checkbox" value="${key}" name="ignoreList"/></td>
+                </tr>
+                #{/ifnot}
+                #{/list}
+                </tbody>
+            </table>
+
+            <a id="ignore-toggle" href="#">Ignored keys (${ignoreList.size()})</a>
+
+            <div id="ignored-keys" style="display:none;">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Key</th>
+                        <th>Value</th>
+                        <th>Ignore</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    #{list items:ignoreList.sort(),as:'key'}
+                    <tr>
+                        <td class="key"><label>${key}</label><br><em>${sources.getSources(key).nl2br()}</em></td>
+                        <td class="message"><textarea rows="3" cols="40" name="values[${key}]"></textarea></td>
+                        <td><input type="checkbox" value="${key}" name="ignoreList" checked/></td>
+                    </tr>
+                    #{/list}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-2">
+            <h3>Existing messages</h3>
+            <table id="existing">
+                <thead>
+                <tr>
+                    <th>Key</th>
+                    <th>Value</th>
+                    <th>Remove</th>
+                    <th>Keep</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                #{list items:existingKeys.sort(),as:'key'}
+                <tr>
+                    <td class="key"><label>${key}</label><br><em>${sources.getSources(key).nl2br()}</em></td>
+                    <td class="message"><textarea rows="3" cols="40" name="values[${key}]">${localizations.get(key)?.raw()}</textarea></td>
+                    <td><input type="checkbox" value="${key}" name="removeList"/></td>
+                    <td><input type="checkbox" value="${key}" name="keepList" #{if keepList.contains(key)}checked#{/if}/></td>
+                </tr>
+                #{/list}
+                </tbody>
+            </table>
+        </div>
+
+        <div id="tab-3">
+            <h3>Possibly obsolete keys</h3>
+            <table id="obsolete">
+                <thead>
+                <tr>
+                    <th>Key</th>
+                    <th>Value</th>
+                    <th>Remove</th>
+                    <th>Keep</th>
+                </tr>
+                </thead>
+                <tbody>
+                #{list items:obsoleteKeys.sort(),as:'key'}
+                <tr>
+                    <td class="key"><label>${key}</label><br><em>${sources.getSources(key).nl2br()}</em></td>
+                    <td class="message"><textarea rows="3" cols="40" name="values[${key}]">${localizations.get(key).raw()}</textarea></td>
+                    <td><input type="checkbox" value="${key}" name="removeList"/></td>
+                    <td><input type="checkbox" value="${key}" name="keepList"/></td>
+                </tr>
+                #{/list}
+                </tbody>
+            </table>
+        </div>
+</div>
+<input type="submit" value="Save"/>
+
+#{/form}
+</div>
+
+<script type="text/javascript">
+$(function(){
+    $("#tabs").tabs();
+    $("td.key").click(function(){
+        $(this).children("em").toggle('fast');
+    return false;
+    });
+    $("#ignore-toggle").click(function() {
+        $("#ignored-keys").toggle("fast");
+        return false;
+    });
+});
+</script>
+</body>
+</html>

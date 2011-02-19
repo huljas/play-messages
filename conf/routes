@@ -5,4 +5,4 @@
 #
 # ~~~~
 
-GET     /?                      Module.index
+GET     /@messages              messages.MessagesList.index

@@ -2,6 +2,8 @@
 
 <project name="play-messages" default="build" basedir=".">
 
+    <property name="play.path" value="c:\code\play"/>
+
     <path id="project.classpath">
         <pathelement path="${play.path}/framework/classes"/>
         <fileset dir="${play.path}/framework/lib">
@@ -10,7 +12,7 @@
         <fileset dir="${play.path}/framework">
             <include name="*.jar"/>
         </fileset>
-        <fileset dir="lib">
+        <fileset dir="lib" erroronmissingdir="false">
             <include name="*.jar"/>
         </fileset>
     </path>
@@ -25,7 +27,7 @@
                 <include name="**/play.static"/>
             </fileset>
         </copy>
-        <jar destfile="lib/play-play-messages.jar" basedir="tmp/classes">
+        <jar destfile="lib/play-messages.jar" basedir="tmp/classes">
             <manifest>
                 <section name="Play-module">
                     <attribute name="Specification-Title" value="play-messages"/>
