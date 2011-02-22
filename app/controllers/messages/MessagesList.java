@@ -16,9 +16,12 @@ import java.util.*;
  */
 public class MessagesList extends Controller {
 
-    public static void index(String language) {
-        if (language == null) {
-            language = Play.langs.get(0);
+    public static void index(String language, String defaultLanguage) {
+        if (StringUtils.isBlank(defaultLanguage)) {
+            defaultLanguage = Play.langs.get(0);
+        }
+        if (StringUtils.isBlank(language)) {
+            language = defaultLanguage;
         }
         File workingFile = ApplicationMessages.getWorkingFile(language);
         Properties localizations;
@@ -27,6 +30,7 @@ public class MessagesList extends Controller {
         } else {
             localizations = Messages.all(language);
         }
+        Properties defaultLocalizations = Messages.all(defaultLanguage);
         SourceMessageKeys sources = ApplicationMessages.lookUp();
         List<String> newKeys = ApplicationMessages.findNewKeys(sources, localizations);
         List<String> obsoleteKeys = ApplicationMessages.findObsoleteKeys(sources, localizations);
@@ -37,10 +41,10 @@ public class MessagesList extends Controller {
         existingKeys.addAll(keepList);
         
         List<String> ignoreList = ApplicationMessages.readKeys(ApplicationMessages.getIgnoreFile());
-        render(workingFile, language, localizations, sources, newKeys, existingKeys, obsoleteKeys, keepList, ignoreList);
+        render(workingFile, language, defaultLanguage, localizations, defaultLocalizations, sources, newKeys, existingKeys, obsoleteKeys, keepList, ignoreList);
     }
 
-    public static void save(String language, Map<String,String> values, List<String> ignoreList, List<String> removeList, List<String> keepList) throws IOException {
+    public static void save(String language, String defaultLanguage, Map<String,String> values, List<String> ignoreList, List<String> removeList, List<String> keepList) throws IOException {
         if (ignoreList == null) {
             ignoreList = Collections.EMPTY_LIST;
         }
@@ -73,6 +77,6 @@ public class MessagesList extends Controller {
         ApplicationMessages.writeUtf8Properties(localizations, ApplicationMessages.getWorkingFile(language), "Created by @messages on " + new Date());
         ApplicationMessages.writeKeys(ignoreList, ApplicationMessages.getIgnoreFile());
         ApplicationMessages.writeKeys(keepList, ApplicationMessages.getKeepFile());
-        index(language);
+        index(language, defaultLanguage);
     }
 }

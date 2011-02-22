@@ -5,38 +5,113 @@
     <meta charset="utf-8"/>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
-<style>
-.ui-tabs { position: relative; padding: .2em; zoom: 1; } /* position: relative prevents IE scroll bug (element with position: relative inside container with overflow: auto appear as "fixed") */
-.ui-tabs .ui-tabs-nav { margin: 0; padding: .2em .2em 0; }
-.ui-tabs .ui-tabs-nav li { list-style: none; float: left; position: relative; top: 1px; margin: 0 .2em 1px 0; border-bottom: 0 !important; padding: 0; white-space: nowrap; }
-.ui-tabs .ui-tabs-nav li a { float: left; padding: .5em 1em; text-decoration: none; }
-.ui-tabs .ui-tabs-nav li.ui-tabs-selected { margin-bottom: 0; padding-bottom: 1px; }
-.ui-tabs .ui-tabs-nav li.ui-tabs-selected a, .ui-tabs .ui-tabs-nav li.ui-state-disabled a, .ui-tabs .ui-tabs-nav li.ui-state-processing a { cursor: text; }
-.ui-tabs .ui-tabs-nav li a, .ui-tabs.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a { cursor: pointer; } /* first selector in group seems obsolete, but required to overcome bug in Opera applying cursor: text overall if defined elsewhere... */
-.ui-tabs .ui-tabs-panel { display: block; border-width: 0; padding: 1em 1.4em; background: none; }
-.ui-tabs .ui-tabs-hide { display: none !important; }
-</style>
+    <link rel="stylesheet" href="@{'/public/stylesheets/smoothness/jquery-ui-1.8.8.custom.css'}">
 
+<style>
+body {
+    font-family: "Lucida Sans Unicode","Lucida Grande",Sans-Serif;
+    font-size: 12px;
+}
+
+#wrap {
+    margin: 0 auto;
+    width: 90%;
+}
+
+table {
+    border-collapse: collapse;
+    text-align: left;
+}
+
+th {
+    color: #003399;
+    font-size: 14px;
+    font-weight: normal;
+    padding: 10px 8px;
+}
+
+tr.odd {
+    background: none repeat scroll 0 0 #E8EDFF;
+}
+
+td {
+    color: #666699;
+    padding: 8px;
+}
+
+.languages {
+    padding: 5px;
+    font-size: 15px;
+}
+
+.selector {
+    float: left;
+    background-color: #124c9a;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    margin: 0 5px;
+    padding: 5px;
+}
+
+.selector label {
+    float: left;
+    color: #fff;
+    font-weight: bold;
+    line-height: 23px;
+    margin-left: 5px;
+}
+
+.selector a, .selector a:visited {
+    color: #666699;
+    text-decoration: none;
+}
+
+.selector .selected a, .selector .selected a:visited {
+    color: #003399;
+    text-decoration: none;
+}
+
+.selector .item {
+    background-color: #E8EDFF;
+    float: left;
+    padding: 2px 7px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    margin: 2px 5px;
+}
+
+.selector .item.selected {
+    background-color: #fff;
+}
+
+</style>
 </head>
 <body>
 <div id="wrap">
-#{if flash.error}
-    <span class="error">${flash.error}</span>
-#{/if}
 
-<h3>Selected language '${language}', change to ...
-#{list items:play.langs,as:'langOption'}
-<a href="@{index(langOption)}" #{if langOption == language}class="selected"#{/if}>${langOption}</a>
-#{/list}
-</h3>
-<h4>
+<div class="languages">
+    <div class="selector">
+        <label>Select language:</label>
+        #{list items:play.langs,as:'langOption'}
+            <div class="item ${langOption == language ? "selected" : ""}"><a href="@{index(langOption,defaultLanguage)}" #{if langOption == language}class="selected"#{/if}>${langOption}</a></div>
+        #{/list}
+    </div>
+    <div class="selector">
+        <label>Compare with:</label>
+        #{list items:play.langs,as:'langOption'}
+            <div class="item ${langOption == defaultLanguage ? "selected" : ""}"><a href="@{index(language,langOption)}" #{if langOption == defaultLanguage}class="selected"#{/if}>${langOption}</a></div>
+        #{/list}
+    </div>
+    <div style="clear:both"></div>
+</div>
+<div class="message">
 #{if workingFile.exists()}
 Read localization from working file ${workingFile.getPath()}.
 #{/if}
 #{else}
 Using default Play messages.
 #{/else}
-</h4>
+</div>
 #{form @save()}
 
 <div id="tabs">
@@ -49,19 +124,21 @@ Using default Play messages.
 
         <div id="tab-1">
             <h3>New keys</h3>
-            <table id="new-keys">
+            <table id="new-keys" border="0" cell-spacing="0">
                 <thead>
                 <tr>
                     <th>Key</th>
-                    <th>Value</th>
+                    <th>Value (${defaultLanguage})</th>
+                    <th>Value (${language})</th>
                     <th>Ignore</th>
                 </tr>
                 </thead>
                 <tbody>
                 #{list items:newKeys.sort(),as:'key'}
                 #{ifnot ignoreList.contains(key)}
-                <tr>
+                <tr class="${key_index % 2 == 1 ? "odd" : "even"}">
                     <td class="key"><label>${key}</label><br><em>${sources.getSources(key).nl2br()}</em></td>
+                    <td class="default"><p>${defaultLocalizations.get(key)}</p></td>
                     <td class="message"><textarea rows="3" cols="40" name="values[${key}]"></textarea></td>
                     <td><input type="checkbox" value="${key}" name="ignoreList"/></td>
                 </tr>
