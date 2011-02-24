@@ -42,7 +42,7 @@ public class ApplicationMessages {
     }
 
     public static File getWorkingDir() {
-        File dir = new File(Play.configuration.getProperty("messages.working.dir", "tmp"));
+        File dir = new File(Play.configuration.getProperty("messages.working.dir", "conf"));
         return dir;
     }
 

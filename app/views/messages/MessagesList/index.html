@@ -23,6 +23,30 @@ table {
     text-align: left;
 }
 
+td, th {
+    border: 1px solid #D8DFF2;
+}
+
+td.key {
+    width: 24%;
+}
+
+td.default, td.message {
+    min-width: 220px;
+    width: 38%;
+}
+
+td.action {
+    text-align: center;
+}
+
+
+
+textarea {
+    border: 1px solid #666699;
+    width: 100%;
+}
+
 th {
     color: #003399;
     font-size: 14px;
@@ -39,71 +63,20 @@ td {
     padding: 8px;
 }
 
-.languages {
-    padding: 5px;
-    font-size: 15px;
-}
-
-.selector {
-    float: left;
+select {
+    border: solid 1px #666699;
     background-color: #124c9a;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    margin: 0 5px;
-    padding: 5px;
-}
-
-.selector label {
-    float: left;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    padding: 1px 2px;
+    font-size: 15px;
     color: #fff;
-    font-weight: bold;
-    line-height: 23px;
-    margin-left: 5px;
 }
-
-.selector a, .selector a:visited {
-    color: #666699;
-    text-decoration: none;
-}
-
-.selector .selected a, .selector .selected a:visited {
-    color: #003399;
-    text-decoration: none;
-}
-
-.selector .item {
-    background-color: #E8EDFF;
-    float: left;
-    padding: 2px 7px;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    margin: 2px 5px;
-}
-
-.selector .item.selected {
-    background-color: #fff;
-}
-
 </style>
 </head>
 <body>
 <div id="wrap">
 
-<div class="languages">
-    <div class="selector">
-        <label>Select language:</label>
-        #{list items:play.langs,as:'langOption'}
-            <div class="item ${langOption == language ? "selected" : ""}"><a href="@{index(langOption,defaultLanguage)}" #{if langOption == language}class="selected"#{/if}>${langOption}</a></div>
-        #{/list}
-    </div>
-    <div class="selector">
-        <label>Compare with:</label>
-        #{list items:play.langs,as:'langOption'}
-            <div class="item ${langOption == defaultLanguage ? "selected" : ""}"><a href="@{index(language,langOption)}" #{if langOption == defaultLanguage}class="selected"#{/if}>${langOption}</a></div>
-        #{/list}
-    </div>
-    <div style="clear:both"></div>
-</div>
 <div class="message">
 #{if workingFile.exists()}
 Read localization from working file ${workingFile.getPath()}.
@@ -121,6 +94,7 @@ Using default Play messages.
         <li><a href="#tab-3">Obsolete (${obsoleteKeys.size()})</a></li>
     </ul>
         <input type="hidden" name="language" value="${language}"/>
+        <input type="hidden" name="defaultLanguage" value="${defaultLanguage}"/>
 
         <div id="tab-1">
             <h3>New keys</h3>
@@ -128,21 +102,19 @@ Using default Play messages.
                 <thead>
                 <tr>
                     <th>Key</th>
-                    <th>Value (${defaultLanguage})</th>
-                    <th>Value (${language})</th>
+                    <th>Compare #{include 'messages/MessagesList/_compareSelector.html'/}</th>
+                    <th>Edit #{include 'messages/MessagesList/_targetSelector.html'/}</th>
                     <th>Ignore</th>
                 </tr>
                 </thead>
                 <tbody>
                 #{list items:newKeys.sort(),as:'key'}
-                #{ifnot ignoreList.contains(key)}
                 <tr class="${key_index % 2 == 1 ? "odd" : "even"}">
                     <td class="key"><label>${key}</label><br><em>${sources.getSources(key).nl2br()}</em></td>
                     <td class="default"><p>${defaultLocalizations.get(key)}</p></td>
                     <td class="message"><textarea rows="3" cols="40" name="values[${key}]"></textarea></td>
-                    <td><input type="checkbox" value="${key}" name="ignoreList"/></td>
+                    <td class="action"><input type="checkbox" value="${key}" name="ignoreList"/></td>
                 </tr>
-                #{/ifnot}
                 #{/list}
                 </tbody>
             </table>
@@ -154,16 +126,18 @@ Using default Play messages.
                     <thead>
                     <tr>
                         <th>Key</th>
-                        <th>Value</th>
+                        <th>Compare #{include 'messages/MessagesList/_compareSelector.html'/}</th>
+                        <th>Edit #{include 'messages/MessagesList/_targetSelector.html'/}</th>
                         <th>Ignore</th>
                     </tr>
                     </thead>
                     <tbody>
                     #{list items:ignoreList.sort(),as:'key'}
-                    <tr>
+                    <tr class="${key_index % 2 == 1 ? "odd" : "even"}">
                         <td class="key"><label>${key}</label><br><em>${sources.getSources(key).nl2br()}</em></td>
+                        <td class="default"><p>${defaultLocalizations.get(key)}</p></td>
                         <td class="message"><textarea rows="3" cols="40" name="values[${key}]"></textarea></td>
-                        <td><input type="checkbox" value="${key}" name="ignoreList" checked/></td>
+                        <td class="action"><input type="checkbox" value="${key}" name="ignoreList" checked/></td>
                     </tr>
                     #{/list}
                     </tbody>
@@ -172,12 +146,13 @@ Using default Play messages.
         </div>
 
         <div id="tab-2">
-            <h3>Existing messages</h3>
+            <h3>Existing keys</h3>
             <table id="existing">
                 <thead>
                 <tr>
                     <th>Key</th>
-                    <th>Value</th>
+                    <th>Compare #{include 'messages/MessagesList/_compareSelector.html'/}</th>
+                    <th>Edit #{include 'messages/MessagesList/_targetSelector.html'/}</th>
                     <th>Remove</th>
                     <th>Keep</th>
                 </tr>
@@ -187,9 +162,10 @@ Using default Play messages.
                 #{list items:existingKeys.sort(),as:'key'}
                 <tr>
                     <td class="key"><label>${key}</label><br><em>${sources.getSources(key).nl2br()}</em></td>
+                    <td class="default"><p>${defaultLocalizations.get(key)}</p></td>
                     <td class="message"><textarea rows="3" cols="40" name="values[${key}]">${localizations.get(key)?.raw()}</textarea></td>
-                    <td><input type="checkbox" value="${key}" name="removeList"/></td>
-                    <td><input type="checkbox" value="${key}" name="keepList" #{if keepList.contains(key)}checked#{/if}/></td>
+                    <td class="action"><input type="checkbox" value="${key}" name="removeList"/></td>
+                    <td class="action"><input type="checkbox" value="${key}" name="keepList" #{if keepList.contains(key)}checked#{/if}/></td>
                 </tr>
                 #{/list}
                 </tbody>
@@ -202,7 +178,8 @@ Using default Play messages.
                 <thead>
                 <tr>
                     <th>Key</th>
-                    <th>Value</th>
+                    <th>Compare #{include 'messages/MessagesList/_compareSelector.html'/}</th>
+                    <th>Edit #{include 'messages/MessagesList/_targetSelector.html'/}</th>
                     <th>Remove</th>
                     <th>Keep</th>
                 </tr>
@@ -211,9 +188,10 @@ Using default Play messages.
                 #{list items:obsoleteKeys.sort(),as:'key'}
                 <tr>
                     <td class="key"><label>${key}</label><br><em>${sources.getSources(key).nl2br()}</em></td>
+                    <td class="default"><p>${defaultLocalizations.get(key)}</p></td>
                     <td class="message"><textarea rows="3" cols="40" name="values[${key}]">${localizations.get(key).raw()}</textarea></td>
-                    <td><input type="checkbox" value="${key}" name="removeList"/></td>
-                    <td><input type="checkbox" value="${key}" name="keepList"/></td>
+                    <td class="action"><input type="checkbox" value="${key}" name="removeList"/></td>
+                    <td class="action"><input type="checkbox" value="${key}" name="keepList"/></td>
                 </tr>
                 #{/list}
                 </tbody>
@@ -235,6 +213,11 @@ $(function(){
     $("#ignore-toggle").click(function() {
         $("#ignored-keys").toggle("fast");
         return false;
+    });
+    $("select").bind('click', function() {
+        if ($(this).data("selected") != $(this).val()) {
+            window.location = $(this).find("option:selected").data("href");
+        }
     });
 });
 </script>

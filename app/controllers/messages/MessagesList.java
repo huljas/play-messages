@@ -36,11 +36,12 @@ public class MessagesList extends Controller {
         List<String> obsoleteKeys = ApplicationMessages.findObsoleteKeys(sources, localizations);
         List<String> existingKeys = ApplicationMessages.findExistingKeys(sources, localizations);
         List<String> keepList = ApplicationMessages.readKeys(ApplicationMessages.getKeepFile());
+        List<String> ignoreList = ApplicationMessages.readKeys(ApplicationMessages.getIgnoreFile());
 
         obsoleteKeys.removeAll(keepList);
         existingKeys.addAll(keepList);
-        
-        List<String> ignoreList = ApplicationMessages.readKeys(ApplicationMessages.getIgnoreFile());
+        newKeys.removeAll(ignoreList);
+
         render(workingFile, language, defaultLanguage, localizations, defaultLocalizations, sources, newKeys, existingKeys, obsoleteKeys, keepList, ignoreList);
     }
 
