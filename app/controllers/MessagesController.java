@@ -1,10 +1,8 @@
-package controllers.messages;
+package controllers;
 
 import org.apache.commons.lang.StringUtils;
 import play.Play;
 import play.i18n.Messages;
-import play.modules.messages.ApplicationMessages;
-import play.modules.messages.SourceMessageKeys;
 import play.mvc.Controller;
 
 import java.io.File;
@@ -14,7 +12,7 @@ import java.util.*;
 /**
  * @author heikkiu
  */
-public class MessagesList extends Controller {
+public class MessagesController extends Controller {
 
     public static void index(String language, String defaultLanguage) {
         if (StringUtils.isBlank(defaultLanguage)) {

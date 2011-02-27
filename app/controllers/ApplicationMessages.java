@@ -1,10 +1,12 @@
-package play.modules.messages;
+package controllers;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import play.Play;
 import play.libs.IO;
+import play.templates.JavaExtensions;
+import play.utils.HTML;
 
 import java.io.*;
 import java.util.*;
@@ -25,20 +27,33 @@ public class ApplicationMessages {
                 List<String> lines = IOUtils.readLines(new FileReader(file));
                 int i = 0;
                 for (String line : lines) {
-                    i++;
-                    if (line.startsWith("//")) {
-                        continue;
-                    }
                     List<String> keys = matcher.match(line);
                     for (String key : keys) {
-                        foundKeys.addKey(key, file, i);
+                        String snippet = getSnippet(key, i, lines);
+                        foundKeys.addKey(key, file, snippet);
                     }
+                    i++;
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
         return foundKeys;
+    }
+
+    private static String getSnippet(String key, int line, List<String> lines) {
+        int start = Math.max(0, line - 2);
+        int end = Math.min(line + 2, lines.size() - 1);
+        StringBuilder snippet = new StringBuilder();
+        for (int i = start; i <= end; i++) {
+            String s = lines.get(i);
+            s = HTML.htmlEscape(s);
+            if (i == line) {
+                s = s.replace(key, "</pre><pre class=\"k\">" + key + "</pre><pre class=\"co\">");
+            }
+            snippet.append("<div class=\"line").append(i % 2 == 0 ? " even" : " odd").append(i == line ? " focus" : "").append("\"><pre class=\"lno\">").append(i + 1).append(" :</pre><pre class=\"co\">").append(s).append("</pre></div>");
+        }
+        return snippet.toString();
     }
 
     public static File getWorkingDir() {

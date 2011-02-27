@@ -5,4 +5,4 @@
 #
 # ~~~~
 
-GET     /@messages              messages.MessagesList.index
+GET     /@messages              MessagesController.index

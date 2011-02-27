@@ -1,10 +1,10 @@
-package play.modules.messages;
+package controllers;
 
 import java.io.File;
 import java.util.*;
 
 /**
- * List of localization keys in the sources.
+ * List of localization keys in the sourceFiles.
  */
 public class SourceMessageKeys {
 
@@ -17,16 +17,16 @@ public class SourceMessageKeys {
         this.keys = keys;
     }
 
-    public void addKey(String foundKey, File file, int line) {
+    public void addKey(String foundKey, File file, String snippet) {
         KeySourceList key = keys.get(foundKey);
         if (key == null) {
             key = new KeySourceList(foundKey);
             keys.put(foundKey, key);
         }
-        key.addSource(file, line);
+        key.addSource(file, snippet);
     }
 
-    public KeySourceList getSources(String key) {
+    public KeySourceList getKeySourceList(String key) {
         KeySourceList list = keys.get(key);
         if (list == null) {
             list = new KeySourceList(key);
@@ -99,29 +99,29 @@ public class SourceMessageKeys {
     }
 
     /**
-     * List of sources for localization key.
+     * List of sourceFiles for localization key.
      */
-    private class KeySourceList {
+    public static class KeySourceList {
 
-        private HashSet<KeySource> sources = new HashSet<KeySource>();
+        public HashSet<SourceFile> sourceFiles = new HashSet<SourceFile>();
 
-        private String foundKey;
+        public String foundKey;
 
         public KeySourceList(String foundKey) {
             this.foundKey = foundKey;
         }
 
-        public void addSource(File file, int line) {
-            sources.add(new KeySource(file.getPath(), line));
+        public void addSource(File file, String snippet) {
+            sourceFiles.add(new SourceFile(file.getPath(), snippet));
         }
 
         public String toString() {
             StringBuilder builder = new StringBuilder();
             int i = 0;
-            for (KeySource source : sources) {
+            for (SourceFile sourceFile : sourceFiles) {
                 i++;
-                builder.append(source);
-                if (i < sources.size()) {
+                builder.append(sourceFile);
+                if (i < sourceFiles.size()) {
                     builder.append(",\n");
                 }
                 if (i > 5) {
@@ -139,17 +139,17 @@ public class SourceMessageKeys {
         /**
          * Source for localization key.
          */
-        private class KeySource {
-            private String name;
-            private int line;
+        public static class SourceFile {
+            public String path;
+            public String snippet;
 
-            public KeySource(String name, int line) {
-                this.name = name;
-                this.line = line;
+            public SourceFile(String path, String snippet) {
+                this.path = path;
+                this.snippet = snippet;
             }
 
             public String toString() {
-                return name + "(" + line + ")";
+                return path + "(" + snippet + ")";
             }
         }
     }

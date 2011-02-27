@@ -1,9 +1,9 @@
 #{extends 'main.html'/}
 <div class="lang-select section">
-<strong>&{'changeLang'}:</strong>
-#{list items:play.langs, as:'newLang'}
-<a href="@{setLang(newLang)}">${newLang}</a>&nbsp;
-#{/list}
+    <strong>&{'changeLang'}:</strong>
+    #{list items:play.langs, as:'newLang'}
+    <a href="@{setLang(newLang)}">${newLang}</a>&nbsp;
+    #{/list}
 </div>
 
 #{if hello}

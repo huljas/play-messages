@@ -24,11 +24,14 @@ table {
 }
 
 td, th {
-    border: 1px solid #D8DFF2;
+    border: 1px solid #aaa;
 }
 
 td.key {
     width: 24%;
+    vertical-align: top;
+    color: #333;
+    font-weight: bold;
 }
 
 td.default, td.message {
@@ -43,35 +46,99 @@ td.action {
 
 
 textarea {
-    border: 1px solid #666699;
+    border: 1px solid #666;
     width: 100%;
+    background-color: #eee;
+    color: #555;
+    padding: 3px;
+}
+
+textarea:focus {
+    background-color: #ffe;
+    color: #333;
 }
 
 th {
-    color: #003399;
+    color: #333;
     font-size: 14px;
     font-weight: normal;
     padding: 10px 8px;
 }
 
 tr.odd {
-    background: none repeat scroll 0 0 #E8EDFF;
+    background-color: #ddd;
 }
 
 td {
-    color: #666699;
+    color: #666;
     padding: 8px;
 }
 
 select {
-    border: solid 1px #666699;
-    background-color: #124c9a;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
+    border: solid 1px #666;
+    background-color: #fff;
     padding: 1px 2px;
     font-size: 15px;
-    color: #fff;
+    color: #333;
 }
+
+.sources {
+    -moz-border-radius: 5px 5px 5px 5px;
+    -moz-box-shadow: 2px 2px 5px 2px #666666;
+    background-color: #FFFFFF;
+    border: 1px solid #999999;
+    padding: 0 3px;
+    position: absolute;
+    z-index: 100;
+}
+
+.sources strong {
+    background: none repeat scroll 0 0 #666666;
+    color: #FFFFFF;
+    display: block;
+    margin: 4px 0;
+    padding: 2px 5px;
+}
+
+.code {
+    margin-bottom: 4px;
+}
+
+.line {
+    font-family: 'Bitstream Vera Sans Mono','Courier',monospace;
+    color: #333;
+    line-height: 14px;
+}
+
+.line pre {
+    display: inline;
+    margin: 0;
+}
+
+.line pre.lno {
+    color: #f5d;
+    margin-right: 3px;
+    background-color: #333;
+}
+
+.line.odd {
+    background-color: #fff;
+}
+
+.line.even {
+    background-color: #ddd;
+}
+
+.line.focus {
+    background-color: #FF88DD;
+    color: #882244;
+}
+
+.line pre.k {
+    color: #054A10;
+    font-weight: bold;
+}
+
 </style>
 </head>
 <body>
@@ -102,15 +169,15 @@ Using default Play messages.
                 <thead>
                 <tr>
                     <th>Key</th>
-                    <th>Compare #{include 'messages/MessagesList/_compareSelector.html'/}</th>
-                    <th>Edit #{include 'messages/MessagesList/_targetSelector.html'/}</th>
+                    <th>Compare #{include '_compareSelector.html'/}</th>
+                    <th>Edit #{include '_targetSelector.html'/}</th>
                     <th>Ignore</th>
                 </tr>
                 </thead>
                 <tbody>
                 #{list items:newKeys.sort(),as:'key'}
                 <tr class="${key_index % 2 == 1 ? "odd" : "even"}">
-                    <td class="key"><label>${key}</label><br><em>${sources.getSources(key).nl2br()}</em></td>
+                    <td class="key">#{include '_keyWithSources.html'/}</td>
                     <td class="default"><p>${defaultLocalizations.get(key)}</p></td>
                     <td class="message"><textarea rows="3" cols="40" name="values[${key}]"></textarea></td>
                     <td class="action"><input type="checkbox" value="${key}" name="ignoreList"/></td>
@@ -126,15 +193,15 @@ Using default Play messages.
                     <thead>
                     <tr>
                         <th>Key</th>
-                        <th>Compare #{include 'messages/MessagesList/_compareSelector.html'/}</th>
-                        <th>Edit #{include 'messages/MessagesList/_targetSelector.html'/}</th>
+                        <th>Compare #{include '_compareSelector.html'/}</th>
+                        <th>Edit #{include '_targetSelector.html'/}</th>
                         <th>Ignore</th>
                     </tr>
                     </thead>
                     <tbody>
                     #{list items:ignoreList.sort(),as:'key'}
                     <tr class="${key_index % 2 == 1 ? "odd" : "even"}">
-                        <td class="key"><label>${key}</label><br><em>${sources.getSources(key).nl2br()}</em></td>
+                        <td class="key">#{include '_keyWithSources.html'/}</td>
                         <td class="default"><p>${defaultLocalizations.get(key)}</p></td>
                         <td class="message"><textarea rows="3" cols="40" name="values[${key}]"></textarea></td>
                         <td class="action"><input type="checkbox" value="${key}" name="ignoreList" checked/></td>
@@ -151,8 +218,8 @@ Using default Play messages.
                 <thead>
                 <tr>
                     <th>Key</th>
-                    <th>Compare #{include 'messages/MessagesList/_compareSelector.html'/}</th>
-                    <th>Edit #{include 'messages/MessagesList/_targetSelector.html'/}</th>
+                    <th>Compare #{include '_compareSelector.html'/}</th>
+                    <th>Edit #{include '_targetSelector.html'/}</th>
                     <th>Remove</th>
                     <th>Keep</th>
                 </tr>
@@ -161,7 +228,7 @@ Using default Play messages.
 
                 #{list items:existingKeys.sort(),as:'key'}
                 <tr>
-                    <td class="key"><label>${key}</label><br><em>${sources.getSources(key).nl2br()}</em></td>
+                    <td class="key">#{include '_keyWithSources.html'/}</td>
                     <td class="default"><p>${defaultLocalizations.get(key)}</p></td>
                     <td class="message"><textarea rows="3" cols="40" name="values[${key}]">${localizations.get(key)?.raw()}</textarea></td>
                     <td class="action"><input type="checkbox" value="${key}" name="removeList"/></td>
@@ -178,8 +245,8 @@ Using default Play messages.
                 <thead>
                 <tr>
                     <th>Key</th>
-                    <th>Compare #{include 'messages/MessagesList/_compareSelector.html'/}</th>
-                    <th>Edit #{include 'messages/MessagesList/_targetSelector.html'/}</th>
+                    <th>Compare #{include '_compareSelector.html'/}</th>
+                    <th>Edit #{include '_targetSelector.html'/}</th>
                     <th>Remove</th>
                     <th>Keep</th>
                 </tr>
@@ -187,7 +254,7 @@ Using default Play messages.
                 <tbody>
                 #{list items:obsoleteKeys.sort(),as:'key'}
                 <tr>
-                    <td class="key"><label>${key}</label><br><em>${sources.getSources(key).nl2br()}</em></td>
+                    <td class="key">#{include '_keyWithSources.html'/}</td>
                     <td class="default"><p>${defaultLocalizations.get(key)}</p></td>
                     <td class="message"><textarea rows="3" cols="40" name="values[${key}]">${localizations.get(key).raw()}</textarea></td>
                     <td class="action"><input type="checkbox" value="${key}" name="removeList"/></td>
@@ -217,6 +284,14 @@ $(function(){
     $("select").bind('click', function() {
         if ($(this).data("selected") != $(this).val()) {
             window.location = $(this).find("option:selected").data("href");
+        }
+    });
+    $("td.key").click(function() {
+        if ($(this).find(".sources:hidden").length > 0) {
+            $(".key-with-sources .sources:visible").hide();
+            $(this).find(".sources").show();
+        } else {
+            $(".key-with-sources .sources:visible").hide();
         }
     });
 });

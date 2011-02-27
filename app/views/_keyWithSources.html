@@ -1,0 +1,11 @@
+<div class="key-with-sources" style="position:relative">
+<label>${key}</label>
+<div class="sources" style="display:none">
+    #{list items:sources.getKeySourceList(key).sourceFiles,as:'source'}
+        <div class="source">
+            <strong>${source.path}</strong>
+            <div class="code">${source.snippet.raw()}</div>
+        </div>
+    #{/list}
+</div>
+</div>
