@@ -17,13 +17,13 @@ public class SourceMessageKeys {
         this.keys = keys;
     }
 
-    public void addKey(String foundKey, File file, String snippet) {
+    public void addKey(String foundKey, File file, String snippet, int lineNo) {
         KeySourceList key = keys.get(foundKey);
         if (key == null) {
             key = new KeySourceList(foundKey);
             keys.put(foundKey, key);
         }
-        key.addSource(file, snippet);
+        key.addSource(file, snippet, lineNo);
     }
 
     public KeySourceList getKeySourceList(String key) {
@@ -111,8 +111,15 @@ public class SourceMessageKeys {
             this.foundKey = foundKey;
         }
 
-        public void addSource(File file, String snippet) {
-            sourceFiles.add(new SourceFile(file.getPath(), snippet));
+        public List<SourceFile> listSourceFiles() {
+            ArrayList<SourceFile> list = new ArrayList<SourceFile>();
+            list.addAll(sourceFiles);
+            Collections.sort(list);
+            return list;
+        }
+
+        public void addSource(File file, String snippet, int lineNo) {
+            sourceFiles.add(new SourceFile(file.getPath(), snippet, lineNo));
         }
 
         public String toString() {
@@ -139,17 +146,27 @@ public class SourceMessageKeys {
         /**
          * Source for localization key.
          */
-        public static class SourceFile {
+        public static class SourceFile implements Comparable<SourceFile> {
             public String path;
             public String snippet;
+            public int lineNo;
 
-            public SourceFile(String path, String snippet) {
+            public SourceFile(String path, String snippet, int lineNo) {
                 this.path = path;
                 this.snippet = snippet;
+                this.lineNo = lineNo;
             }
 
             public String toString() {
                 return path + "(" + snippet + ")";
+            }
+
+            public int compareTo(SourceFile o) {
+                int i = path.compareTo(o.path);
+                if (i == 0) {
+                    i = new Integer(lineNo).compareTo(o.lineNo);
+                }
+                return i;
             }
         }
     }

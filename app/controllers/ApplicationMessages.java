@@ -30,7 +30,7 @@ public class ApplicationMessages {
                     List<String> keys = matcher.match(line);
                     for (String key : keys) {
                         String snippet = getSnippet(key, i, lines);
-                        foundKeys.addKey(key, file, snippet);
+                        foundKeys.addKey(key, file, snippet, i);
                     }
                     i++;
                 }

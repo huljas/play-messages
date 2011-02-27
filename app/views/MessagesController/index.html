@@ -16,6 +16,7 @@ body {
 #wrap {
     margin: 0 auto;
     width: 90%;
+    min-width: 600px;
 }
 
 table {
@@ -35,7 +36,6 @@ td.key {
 }
 
 td.default, td.message {
-    min-width: 220px;
     width: 38%;
 }
 
@@ -47,7 +47,7 @@ td.action {
 
 textarea {
     border: 1px solid #666;
-    width: 100%;
+    width: 99%;
     background-color: #eee;
     color: #555;
     padding: 3px;
@@ -70,8 +70,8 @@ tr.odd {
 }
 
 td {
-    color: #666;
-    padding: 8px;
+    color: #333;
+    padding: 5px;
 }
 
 select {
@@ -90,6 +90,8 @@ select {
     padding: 0 3px;
     position: absolute;
     z-index: 100;
+    max-height: 400px;
+    overflow-y: auto;
 }
 
 .sources strong {
@@ -176,7 +178,7 @@ Using default Play messages.
                 </thead>
                 <tbody>
                 #{list items:newKeys.sort(),as:'key'}
-                <tr class="${key_index % 2 == 1 ? "odd" : "even"}">
+                <tr class="${key_parity}">
                     <td class="key">#{include '_keyWithSources.html'/}</td>
                     <td class="default"><p>${defaultLocalizations.get(key)}</p></td>
                     <td class="message"><textarea rows="3" cols="40" name="values[${key}]"></textarea></td>
@@ -200,7 +202,7 @@ Using default Play messages.
                     </thead>
                     <tbody>
                     #{list items:ignoreList.sort(),as:'key'}
-                    <tr class="${key_index % 2 == 1 ? "odd" : "even"}">
+                    <tr class="${key_parity}">
                         <td class="key">#{include '_keyWithSources.html'/}</td>
                         <td class="default"><p>${defaultLocalizations.get(key)}</p></td>
                         <td class="message"><textarea rows="3" cols="40" name="values[${key}]"></textarea></td>
@@ -227,7 +229,7 @@ Using default Play messages.
                 <tbody>
 
                 #{list items:existingKeys.sort(),as:'key'}
-                <tr>
+                <tr class="${key_parity}">
                     <td class="key">#{include '_keyWithSources.html'/}</td>
                     <td class="default"><p>${defaultLocalizations.get(key)}</p></td>
                     <td class="message"><textarea rows="3" cols="40" name="values[${key}]">${localizations.get(key)?.raw()}</textarea></td>
