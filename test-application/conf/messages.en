@@ -1,3 +1,4 @@
 # Created by @messages on Thu Feb 24 22:41:34 EET 2011
 changeLang=Change language
 drunken=Drunken
+obsoleteKey=Obsolete key is shown as obsolete since it is not found in the code!

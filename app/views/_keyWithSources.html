@@ -1,11 +1,18 @@
 <div class="key-with-sources" style="position:relative">
 <label>${key}</label>
 <div class="sources" style="display:none">
+    #{if sources.getKeySourceList(key).listSourceFiles().size() > 0}
     #{list items:sources.getKeySourceList(key).listSourceFiles(),as:'source'}
         <div class="source">
             <strong>${source.path}</strong>
-            <div class="code">${source.snippet.raw()}</div>
+            #{list items:source.listSnippets(),as:'snippet'}
+                <div class="code">${snippet.snippet.raw()}</div>
+            #{/list}
         </div>
     #{/list}
+    #{/if}
+    #{else}
+    Key was not found from sources.
+    #{/else}
 </div>
 </div>

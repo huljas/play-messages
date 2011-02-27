@@ -1,5 +1,7 @@
 package controllers;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import java.io.File;
 import java.util.*;
 
@@ -103,7 +105,7 @@ public class SourceMessageKeys {
      */
     public static class KeySourceList {
 
-        public HashSet<SourceFile> sourceFiles = new HashSet<SourceFile>();
+        public HashMap<String, SourceFile> sourceFiles = new HashMap<String, SourceFile>();
 
         public String foundKey;
 
@@ -112,31 +114,18 @@ public class SourceMessageKeys {
         }
 
         public List<SourceFile> listSourceFiles() {
-            ArrayList<SourceFile> list = new ArrayList<SourceFile>();
-            list.addAll(sourceFiles);
+            ArrayList<SourceFile> list = new ArrayList<SourceFile>(sourceFiles.values());
             Collections.sort(list);
             return list;
         }
 
         public void addSource(File file, String snippet, int lineNo) {
-            sourceFiles.add(new SourceFile(file.getPath(), snippet, lineNo));
-        }
-
-        public String toString() {
-            StringBuilder builder = new StringBuilder();
-            int i = 0;
-            for (SourceFile sourceFile : sourceFiles) {
-                i++;
-                builder.append(sourceFile);
-                if (i < sourceFiles.size()) {
-                    builder.append(",\n");
-                }
-                if (i > 5) {
-                    builder.append(" ...");
-                    break;
-                }
+            SourceFile sourceFile = sourceFiles.get(file.getPath());
+            if (sourceFile == null) {
+                sourceFile = new SourceFile(file.getPath());
+                sourceFiles.put(file.getPath(), sourceFile);
             }
-            return builder.toString();
+            sourceFile.addSnippet(snippet, lineNo);
         }
 
         public String getKey() {
@@ -148,25 +137,38 @@ public class SourceMessageKeys {
          */
         public static class SourceFile implements Comparable<SourceFile> {
             public String path;
-            public String snippet;
-            public int lineNo;
 
-            public SourceFile(String path, String snippet, int lineNo) {
+            public List<Snippet> snippets = new ArrayList<Snippet>();
+
+            public SourceFile(String path) {
                 this.path = path;
-                this.snippet = snippet;
-                this.lineNo = lineNo;
             }
 
-            public String toString() {
-                return path + "(" + snippet + ")";
+            public void addSnippet(String snippet, int lineNo) {
+                snippets.add(new Snippet(snippet,lineNo));
+            }
+
+            public List<Snippet> listSnippets() {
+                Collections.sort(snippets);
+                return snippets;
             }
 
             public int compareTo(SourceFile o) {
-                int i = path.compareTo(o.path);
-                if (i == 0) {
-                    i = new Integer(lineNo).compareTo(o.lineNo);
+                return path.compareTo(o.path);
+            }
+
+            public static class Snippet implements Comparable<Snippet> {
+                public String snippet;
+                public int lineNo;
+
+                public Snippet(String snippet, int lineNo) {
+                    this.snippet = snippet;
+                    this.lineNo = lineNo;
                 }
-                return i;
+
+                public int compareTo(Snippet o) {
+                    return new Integer(lineNo).compareTo(o.lineNo);
+                }
             }
         }
     }
