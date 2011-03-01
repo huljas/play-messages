@@ -143,19 +143,27 @@ select {
     font-weight: bold;
 }
 
+.success {
+    font-size: 15px;
+    border: 1px solid #666;
+    padding: 5px 11px;
+    margin-bottom: 11px;
+    -moz-border-radius: 5px;
+    background-color: #626585;
+    color: #fff;
+    font-weight: bold;
+}
+
 </style>
 </head>
 <body>
 <div id="wrap">
 
-<div class="message">
-#{if workingFile.exists()}
-Read localization from working file ${workingFile.getPath()}.
-#{/if}
-#{else}
-Using default Play messages.
-#{/else}
+#{if flash.success}
+<div class="success">
+${flash.success}
 </div>
+#{/if}
 #{form @save()}
 
 <div id="tabs">
@@ -189,6 +197,10 @@ Using default Play messages.
                 #{/list}
                 </tbody>
             </table>
+
+            <a id="add-key" href="#">Add new key</a>
+
+            <br>
 
             <a id="ignore-toggle" href="#">Ignored keys (${ignoreList.size()})</a>
 
@@ -257,7 +269,7 @@ Using default Play messages.
                 </thead>
                 <tbody>
                 #{list items:obsoleteKeys.sort(),as:'key'}
-                <tr>
+                <tr class="${key_parity}">
                     <td class="key">#{include '_keyWithSources.html'/}</td>
                     <td class="default"><p>${defaultLocalizations.get(key)}</p></td>
                     <td class="message"><textarea rows="3" cols="40" name="values[${key}]">${localizations.get(key).raw()}</textarea></td>
@@ -298,6 +310,22 @@ $(function(){
             $(".key-with-sources .sources:visible").hide();
         }
     });
+
+    $("#add-key").click(function() {
+        var key = prompt("Key", "enter new key");
+        key = $.trim(key);
+        if (key != null && key != "enter new key" && key != "") {
+            var class = $("#new-keys tbody tr").length % 2 == 0 ? "odd" : "even";
+            $("#new-keys tbody").append('<tr class="'+class+'">'
+                       + '<td class="key">' + key +'</td>'
+                       + '<td class="default"><p></p></td>'
+                       + '<td class="message"><textarea rows="3" cols="40" name="values[' + key + ']"></textarea></td>'
+                       + '<td class="action"><input type="hidden" value="' + key+ '" name="keepList"/></td>'
+                       + '</tr>');
+        }
+        return false;
+    });
+
 });
 </script>
 </body>

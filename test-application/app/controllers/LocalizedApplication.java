@@ -1,5 +1,6 @@
 package controllers;
 
+import org.apache.commons.lang.StringUtils;
 import play.i18n.Lang;
 import play.i18n.Messages;
 import play.mvc.Controller;
@@ -10,7 +11,10 @@ import play.mvc.Controller;
 public class LocalizedApplication extends Controller {
 
     public static void hello(String name) {
-        String hello = Messages.get("hello", name);
+        if (StringUtils.isBlank(name)) {
+            name = Messages.get("you");
+        }
+        String hello = Messages.get("hello.type.normal", name);
         render(hello);
     }
 

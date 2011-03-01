@@ -1,7 +1,5 @@
 package controllers;
 
-import org.apache.commons.collections.CollectionUtils;
-
 import java.io.File;
 import java.util.*;
 
@@ -13,10 +11,6 @@ public class SourceMessageKeys {
     private Map<String, KeySourceList> keys = new HashMap<String, KeySourceList>();
 
     public SourceMessageKeys() {
-    }
-
-    public SourceMessageKeys(Map<String, KeySourceList> keys) {
-        this.keys = keys;
     }
 
     public void addKey(String foundKey, File file, String snippet, int lineNo) {
@@ -46,58 +40,8 @@ public class SourceMessageKeys {
         return builder.toString();
     }
 
-    public SourceMessageKeys notInSet(Set set) {
-        Map<String, KeySourceList> map = new HashMap<String, KeySourceList>();
-        for (KeySourceList key : keys.values()) {
-            if (!set.contains(key.getKey())) {
-                map.put(key.getKey(), key);
-            }
-        }
-        return new SourceMessageKeys(map);
-    }
-
-
-    public List<String> notInSelf(Set set) {
-        Set<String> missing = new HashSet<String>();
-        for (Object key : set) {
-            if (!keys.containsKey(key)) {
-                missing.add((String)key);
-            }
-        }
-        List<String> list = new ArrayList<String>(missing);
-        Collections.sort(list);
-        return list;
-    }
-
-
-    public SourceMessageKeys findInvalidKeys() {
-        Map<String, KeySourceList> map = new HashMap<String, KeySourceList>();
-        for (KeySourceList key : keys.values()) {
-            if (!isValidKey(key.getKey())) {
-                map.put(key.getKey(), key);
-            }
-        }
-        return new SourceMessageKeys(map);
-    }
-
-    public static boolean isValidKey(String key) {
-        return key.matches("(\\p{Alnum}*\\.)*\\p{Alnum}+");
-    }
-
-    public int size() {
-        return keys.size();
-    }
-
     public Set<String> keySet() {
         return keys.keySet();        
-    }
-
-    public Map<String, String> keyMap() {
-        Map<String, String> map = new HashMap<String,String>();
-        for (String key : keys.keySet()) {
-            map.put(key, key);
-        }
-        return map;
     }
 
     /**
@@ -126,10 +70,6 @@ public class SourceMessageKeys {
                 sourceFiles.put(file.getPath(), sourceFile);
             }
             sourceFile.addSnippet(snippet, lineNo);
-        }
-
-        public String getKey() {
-            return foundKey;
         }
 
         /**

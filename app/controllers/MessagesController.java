@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import play.Play;
 import play.i18n.Messages;
 import play.mvc.Controller;
+import play.mvc.Scope;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,7 +41,7 @@ public class MessagesController extends Controller {
         existingKeys.addAll(keepList);
         newKeys.removeAll(ignoreList);
 
-        render(workingFile, language, defaultLanguage, localizations, defaultLocalizations, sources, newKeys, existingKeys, obsoleteKeys, keepList, ignoreList);
+        render(language, defaultLanguage, localizations, defaultLocalizations, sources, newKeys, existingKeys, obsoleteKeys, keepList, ignoreList);
     }
 
     public static void save(String language, String defaultLanguage, Map<String,String> values, List<String> ignoreList, List<String> removeList, List<String> keepList) throws IOException {
@@ -76,6 +77,7 @@ public class MessagesController extends Controller {
         ApplicationMessages.writeUtf8Properties(localizations, ApplicationMessages.getWorkingFile(language), "Created by @messages on " + new Date());
         ApplicationMessages.writeKeys(ignoreList, ApplicationMessages.getIgnoreFile());
         ApplicationMessages.writeKeys(keepList, ApplicationMessages.getKeepFile());
+        flash.success("Localizations saved to %s", ApplicationMessages.getWorkingFile(language).getPath());
         index(language, defaultLanguage);
     }
 }
