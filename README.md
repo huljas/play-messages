@@ -26,7 +26,7 @@ Add the module to the `routes`
 
     *     /     module:play-messages
 
-Start your application and you can find the tool in @messages:
+Start your application and access the tool in @messages:
 
     http://localhost:9000/@messages
 
