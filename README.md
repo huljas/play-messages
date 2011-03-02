@@ -1,20 +1,20 @@
 Play Messages Module
 ====================
 
-Provides a tool for localizing your application in <host>:<port>/@messages.
+This module gives you a tool in @messages for localizing your application.
 
 Tested with play 1.1 on windows and linux.
 
 ## Features
-
-- Scans through your application sources and tries to locate all localization keys
-- The keys are divided into new, existing and obsolete
-- You can edit values for all of them
-- You cam select the language to localize
-- You can select another language to compare with
-- Ignore list for keys that should not be shown as new keys. Mainly intended for keys that are falsely identified as localization keys. These are usually parts of generated keys.
-- Keep list for keys that are should be treated as normal keys although they are not found in the sources. These are usually keys that are generated.
-- Possibility to remove existing and add new keys
+- Web based tool for localizing your application
+- Finds localization keys from your sources
+- Keys are clearly divided into new, existing and obsolete
+- Allows you to edit localizations with one language while comparing it with another
+- Ignore list for keys that should not be shown as new keys, intended for keys that are falsely identified as localization keys
+- Keep list for keys that are should be treated as normal keys although they are not found in the sources
+- Add new keys if needed
+- Remove existing keys
+- Localizations are saved in alphabetical order in your application's messages files
 
 ## Usage
 
@@ -24,9 +24,9 @@ Add the module to your application `application.conf`
 
 Add the module to the `routes`
 
-    *     /                       module:play-messages
+    *     /     module:play-messages
 
-Now you can localize your application using the @messages for example
+Start your application and you can find the tool in @messages:
 
     http://localhost:9000/@messages
 
