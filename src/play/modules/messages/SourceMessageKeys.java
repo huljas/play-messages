@@ -1,4 +1,4 @@
-package controllers;
+package play.modules.messages;
 
 import java.io.File;
 import java.util.*;

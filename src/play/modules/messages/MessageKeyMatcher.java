@@ -1,4 +1,4 @@
-package controllers;
+package play.modules.messages;
 
 import java.util.ArrayList;
 import java.util.List;

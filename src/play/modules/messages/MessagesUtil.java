@@ -1,4 +1,4 @@
-package controllers;
+package play.modules.messages;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
