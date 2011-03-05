@@ -6,7 +6,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * @author heikkiu
+ * Matcher for checking the sources for messages keys.
+ *
+ * @author huljas
  */
 public class MessageKeyMatcher {
 
