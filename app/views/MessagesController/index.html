@@ -154,8 +154,13 @@ select {
     font-weight: bold;
 }
 
+form {
+    display: none;
+}
+
 </style>
 </head>
+
 <body>
 <div id="wrap">
 
@@ -164,6 +169,7 @@ select {
 ${flash.success}
 </div>
 #{/if}
+
 #{form @save()}
 
 <div id="tabs">
@@ -290,7 +296,6 @@ ${flash.success}
 
 <script type="text/javascript">
 $(function(){
-    $("#tabs").hide();
     $("td.key").click(function(){
         $(this).children("em").toggle('fast');
     return false;
@@ -329,7 +334,7 @@ $(function(){
         return false;
     });
     $("#tabs").tabs();
-    $("#tabs").show();
+    $("form").show();
 });
 </script>
 </body>
