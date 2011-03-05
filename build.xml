@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="play-messages" default="build" basedir=".">
+<project name="messages" default="build" basedir=".">
 
     <property name="play.path" value="c:\code\play"/>
 

@@ -184,6 +184,7 @@ ${flash.success}
                     <th>Compare #{include '_compareSelector.html'/}</th>
                     <th>Edit #{include '_targetSelector.html'/}</th>
                     <th>Ignore</th>
+                    <th>Keep</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -193,6 +194,7 @@ ${flash.success}
                     <td class="default"><p>${defaultLocalizations.get(key)}</p></td>
                     <td class="message"><textarea rows="3" cols="40" name="values[${key}]"></textarea></td>
                     <td class="action"><input type="checkbox" value="${key}" name="ignoreList"/></td>
+                    <td class="action"><input type="checkbox" value="${key}" name="keepList" #{if keepList.contains(key)}checked#{/if}/></td>
                 </tr>
                 #{/list}
                 </tbody>
@@ -288,7 +290,7 @@ ${flash.success}
 
 <script type="text/javascript">
 $(function(){
-    $("#tabs").tabs();
+    $("#tabs").hide();
     $("td.key").click(function(){
         $(this).children("em").toggle('fast');
     return false;
@@ -320,12 +322,14 @@ $(function(){
                        + '<td class="key">' + key +'</td>'
                        + '<td class="default"><p></p></td>'
                        + '<td class="message"><textarea rows="3" cols="40" name="values[' + key + ']"></textarea></td>'
-                       + '<td class="action"><input type="hidden" value="' + key+ '" name="keepList"/></td>'
+                       + '<td class="action"><input type="checkbox" value="${key}" name="ignoreList"/></td>'
+                       + '<td class="action"><input type="checkbox" value="' + key+ '" name="keepList" checked/></td>'
                        + '</tr>');
         }
         return false;
     });
-
+    $("#tabs").tabs();
+    $("#tabs").show();
 });
 </script>
 </body>

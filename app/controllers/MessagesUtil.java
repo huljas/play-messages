@@ -5,17 +5,15 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import play.Play;
 import play.libs.IO;
-import play.templates.JavaExtensions;
 import play.utils.HTML;
 
 import java.io.*;
-import java.text.NumberFormat;
 import java.util.*;
 
 /**
  * @author heikkiu
  */
-public class ApplicationMessages {
+public class MessagesUtil {
 
     public static SourceMessageKeys lookUp() {
         SourceMessageKeys foundKeys = new SourceMessageKeys();
@@ -122,48 +120,50 @@ public class ApplicationMessages {
         }
     }
 
-    public static void writeKeys(List<String> keys, File file) {
+    public static void writeKeys(Collection<String> keys, File file) {
         try {
-            IOUtils.writeLines(keys, null, new FileOutputStream(file), "UTF-8");
+            List<String> list = new ArrayList<String>(new HashSet(keys));
+            Collections.sort(list);
+            IOUtils.writeLines(list, null, new FileOutputStream(file), "UTF-8");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
 
-    public static List<String> findNewKeys(SourceMessageKeys sources, Properties messages) {
-        List<String> list = new ArrayList<String>();
+    public static Collection<String> findNewKeys(SourceMessageKeys sources, Properties messages) {
+        Set<String> set = new HashSet<String>();
         for (String newKey : sources.keySet()) {
             if (newKey.startsWith("ads.calendarDialogHeader")) {
                 int i = 0;
             }
 
             if (!messages.containsKey(newKey)) {
-                list.add(newKey);
+                set.add(newKey);
             }
         }
-        return list;
+        return set;
     }
 
-    public static List<String> findObsoleteKeys(SourceMessageKeys sources, Properties messages) {
-        List<String> list = new ArrayList<String>();
+    public static Collection<String> findObsoleteKeys(SourceMessageKeys sources, Properties messages) {
+        Set<String> set = new HashSet<String>();
         for (Object oldKey : messages.keySet()) {
             if (!sources.keySet().contains(oldKey)) {
-                list.add((String) oldKey);
+                set.add((String) oldKey);
             }
         }
-        return list;
+        return set;
     }
 
 
-    public static List<String> findExistingKeys(SourceMessageKeys sources, Properties messages) {
-        List<String> obsoleteKeys = findObsoleteKeys(sources, messages);
-        List<String> list = new ArrayList<String>();
+    public static Collection<String> findExistingKeys(SourceMessageKeys sources, Properties messages) {
+        Collection<String> obsoleteKeys = findObsoleteKeys(sources, messages);
+        Set<String> set = new HashSet<String>();
         for (Object oldKey : messages.keySet()) {
             if (!obsoleteKeys.contains(oldKey)) {
-                list.add((String) oldKey);
+                set.add((String) oldKey);
             }
         }
-        return list;
+        return set;
     }
 }

@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.*;
 
 /**
- * List of localization keys in the sourceFiles.
+ * List of localization keys found in the sources.
  */
 public class SourceMessageKeys {
 
@@ -73,7 +73,7 @@ public class SourceMessageKeys {
         }
 
         /**
-         * Source for localization key.
+         * Single source file.
          */
         public static class SourceFile implements Comparable<SourceFile> {
             public String path;
@@ -97,6 +97,9 @@ public class SourceMessageKeys {
                 return path.compareTo(o.path);
             }
 
+            /**
+             * Code snippet in the source file.
+             */
             public static class Snippet implements Comparable<Snippet> {
                 public String snippet;
                 public int lineNo;

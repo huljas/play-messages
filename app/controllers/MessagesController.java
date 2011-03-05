@@ -4,7 +4,6 @@ import org.apache.commons.lang.StringUtils;
 import play.Play;
 import play.i18n.Messages;
 import play.mvc.Controller;
-import play.mvc.Scope;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,23 +21,29 @@ public class MessagesController extends Controller {
         if (StringUtils.isBlank(language)) {
             language = defaultLanguage;
         }
-        File workingFile = ApplicationMessages.getWorkingFile(language);
+        File workingFile = MessagesUtil.getWorkingFile(language);
         Properties localizations;
         if (workingFile.exists()) {
-            localizations = ApplicationMessages.readUtf8Properties(workingFile);
+            localizations = MessagesUtil.readUtf8Properties(workingFile);
         } else {
             localizations = Messages.all(language);
         }
         Properties defaultLocalizations = Messages.all(defaultLanguage);
-        SourceMessageKeys sources = ApplicationMessages.lookUp();
-        List<String> newKeys = ApplicationMessages.findNewKeys(sources, localizations);
-        List<String> obsoleteKeys = ApplicationMessages.findObsoleteKeys(sources, localizations);
-        List<String> existingKeys = ApplicationMessages.findExistingKeys(sources, localizations);
-        List<String> keepList = ApplicationMessages.readKeys(ApplicationMessages.getKeepFile());
-        List<String> ignoreList = ApplicationMessages.readKeys(ApplicationMessages.getIgnoreFile());
+        SourceMessageKeys sources = MessagesUtil.lookUp();
+        Collection<String> newKeys = MessagesUtil.findNewKeys(sources, localizations);
+        Collection<String> obsoleteKeys = MessagesUtil.findObsoleteKeys(sources, localizations);
+        Collection<String> existingKeys = MessagesUtil.findExistingKeys(sources, localizations);
+        Collection<String> keepList = MessagesUtil.readKeys(MessagesUtil.getKeepFile());
+        Collection<String> ignoreList = MessagesUtil.readKeys(MessagesUtil.getIgnoreFile());
 
+        for (String key : keepList) {
+            if (obsoleteKeys.contains(key)) {
+                existingKeys.add(key);
+            } else {
+                newKeys.add(key);
+            }
+        }
         obsoleteKeys.removeAll(keepList);
-        existingKeys.addAll(keepList);
         newKeys.removeAll(ignoreList);
 
         render(language, defaultLanguage, localizations, defaultLocalizations, sources, newKeys, existingKeys, obsoleteKeys, keepList, ignoreList);
@@ -55,10 +60,10 @@ public class MessagesController extends Controller {
             keepList = Collections.EMPTY_LIST;
         }
         
-        File workingFile = ApplicationMessages.getWorkingFile(language);
+        File workingFile = MessagesUtil.getWorkingFile(language);
         Properties localizations;
         if (workingFile.exists()) {
-            localizations = ApplicationMessages.readUtf8Properties(workingFile);
+            localizations = MessagesUtil.readUtf8Properties(workingFile);
         } else {
             localizations = Messages.all(language);
         }
@@ -74,10 +79,10 @@ public class MessagesController extends Controller {
         for (String remove : removeList) {
             localizations.remove(remove);
         }
-        ApplicationMessages.writeUtf8Properties(localizations, ApplicationMessages.getWorkingFile(language), "Created by @messages on " + new Date());
-        ApplicationMessages.writeKeys(ignoreList, ApplicationMessages.getIgnoreFile());
-        ApplicationMessages.writeKeys(keepList, ApplicationMessages.getKeepFile());
-        flash.success("Localizations saved to %s", ApplicationMessages.getWorkingFile(language).getPath());
+        MessagesUtil.writeUtf8Properties(localizations, MessagesUtil.getWorkingFile(language), "Created by @messages on " + new Date());
+        MessagesUtil.writeKeys(ignoreList, MessagesUtil.getIgnoreFile());
+        MessagesUtil.writeKeys(keepList, MessagesUtil.getKeepFile());
+        flash.success("Localizations saved to %s", MessagesUtil.getWorkingFile(language).getPath());
         index(language, defaultLanguage);
     }
 }

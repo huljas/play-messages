@@ -1,4 +1,4 @@
-# Created by @messages on Tue Mar 01 22:44:43 EET 2011
+# Created by @messages on Sat Mar 05 13:56:20 EET 2011
 changeLang=Change language
 giveYourName=Give your name ...
 happy=Happy
@@ -6,9 +6,9 @@ hello.type.happy=Hello %s \!
 hello.type.loud=HELLO %s \!\!\!
 hello.type.normal=Hello %s
 hello.type.quick=Hi\!
-hello=Hello
 loud=LOUD
-normal=normal
+normal=Normal
+obsolete.key=Obsolete key
 obsoleteKey=Obsolete key is shown as obsolete since it is not found in the code\!
 quick=quick\!
 sayHello=Say hello\!

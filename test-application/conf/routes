@@ -10,7 +10,7 @@ POST    /helloWithType                          LocalizedApplication.helloWithTy
 # Map static resources from the /app/public folder to the /public path
 GET     /public/                                staticDir:public
 
-*     /                       module:play-messages
+*     /                       module:messages
 
 # Catch all
 *       /{controller}/{action}                  {controller}.{action}
