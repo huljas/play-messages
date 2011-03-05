@@ -46,7 +46,7 @@ public class MessagesController extends Controller {
         Collection<String> existingKeys = MessagesUtil.getExistingKeys(sources, localizations);
 
         for (String key : keepList) {
-            if (obsoleteKeys.contains(key)) {
+            if (obsoleteKeys.contains(key) || existingKeys.contains(key)) {
                 existingKeys.add(key);
             } else {
                 newKeys.add(key);
