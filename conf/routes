@@ -6,3 +6,5 @@
 # ~~~~
 
 GET     /@messages              MessagesController.index
+POST    /@messages/update       MessagesController.ajaxSave
+POST    /@messages/apply        MessagesController.applyChanges

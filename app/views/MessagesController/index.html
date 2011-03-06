@@ -31,6 +31,7 @@ th {
 td {
     border-left: 1px solid #D0D0D0;
     border-right: 1px solid #D0D0D0;
+    vertical-align: top;
 }
 
 td.key {
@@ -42,6 +43,10 @@ td.key {
 
 td.default, td.message {
     width: 38%;
+}
+
+td.default pre, td.message pre {
+    margin: 0;
 }
 
 td.action {
@@ -69,7 +74,7 @@ tr.odd {
     background-color: #e9e9ff;
 }
 
-tr:hover {
+tbody tr:hover {
     background-color: #ffc;
 }
 
@@ -258,7 +263,6 @@ ${flash.success}
 </div>
 #{/if}
 
-#{form @save()}
 
 <div id="tabs">
     <ul>
@@ -271,30 +275,42 @@ ${flash.success}
 
         <div id="tab-1">
             <h3>New keys</h3>
+
+            #{form @applyChanges()}
+
+            <div class="action-menu">
+            <a href="#" class="button action"><span>Select items to apply actions</span></a>
+            <ul class="menu-list">
+                <li>Remove</li>
+                <li>Ignore</li>
+                <li>Unignore</li>
+            </ul>
+            </div>
+
             <table id="new-keys" border="0" cell-spacing="0">
                 <thead>
                 <tr>
+                    <th><input type="checkbox" class="check-all"/></th>
                     <th>Key</th>
                     <th>Compare #{include '_compareSelector.html'/}</th>
                     <th>Edit #{include '_targetSelector.html'/}</th>
-                    <th>Ignore</th>
-                    <th>Keep</th>
                 </tr>
                 </thead>
                 <tbody>
                 #{list items:newKeys.sort(),as:'key'}
                 <tr class="${key_parity}">
+                    <td class="action"><input type="checkbox" name="keys" value="${key}"/></td>
                     <td class="key">#{include '_keyWithSources.html'/}</td>
-                    <td class="default"><p>${defaultLocalizations.get(key)}</p></td>
+                    <td class="default"><pre>${defaultLocalizations.get(key)}</pre></td>
                     <td class="message">
                         #{include '_valueWithEdit.html'/}
                     </td>
-                    <td class="action"><input type="checkbox" value="${key}" name="ignoreList"/></td>
-                    <td class="action"><input type="checkbox" value="${key}" name="keepList" #{if keepList.contains(key)}checked#{/if}/></td>
                 </tr>
                 #{/list}
                 </tbody>
             </table>
+
+            #{/form}
 
             <a id="add-key" href="#">Add new key</a>
 
@@ -379,9 +395,7 @@ ${flash.success}
             </table>
         </div>
 </div>
-<input type="submit" value="Save"/>
 
-#{/form}
 </div>
 
 <script type="text/javascript">
@@ -440,14 +454,12 @@ $(function(){
         return false;
     });
     $(".actions .cancel").click(function() {
-        var parent = $(this).closest(".value-edit");
-        var value = parent.prev().html();
-        parent.find("textarea").val(value);
         var tr = $(this).closest("tr");
+        var value = tr.find(".value-view pre").html();
+        tr.find(".value-edit textarea").val(value);
         tr.removeClass("selected");
         return false;
     });
-    $(".actions .cancel").click()
     $("#tabs").tabs();
     $("form").show();
 });

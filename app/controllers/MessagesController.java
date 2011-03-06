@@ -110,4 +110,24 @@ public class MessagesController extends Controller {
         }
         return new ArrayList<String>(new HashSet<String>(list));
     }
+
+    public static void applyChanges(String language, String defaultLanguage, MessagesAction action, List<String> keys) {
+        if (action == MessagesAction.DELETE) {
+            MessagesResource messagesResource = MessagesResource.instance();
+            Map<String,String> map = messagesResource.loadMessages(language);
+            messagesResource.saveMessages(language, map, keys);
+        } else if (action == MessagesAction.IGNORE) {
+            MessagesResource messagesResource = MessagesResource.instance();
+            List<String> ignoreList = messagesResource.loadIgnoreList();
+            ignoreList.removeAll(keys);
+            ignoreList.addAll(keys);
+            messagesResource.saveIgnoreList(ignoreList);
+        } else if (action == MessagesAction.UNIGNORE) {
+            MessagesResource messagesResource = MessagesResource.instance();
+            List<String> ignoreList = messagesResource.loadIgnoreList();
+            ignoreList.removeAll(keys);
+            messagesResource.saveIgnoreList(ignoreList);
+        }
+        index(language, defaultLanguage);
+    }
 }

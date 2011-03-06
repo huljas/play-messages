@@ -1,6 +1,8 @@
-# Created by @messages on Thu Feb 24 22:42:34 EET 2011
+# Saved by @messages on Sun Mar 06 21:17:52 EET 2011
 changeLang=Vaihda kieli
 drunken=Juopunut
 giveYourName=Anna nimesi
 happy=Iloinen\r\n
+hello.type.happy=Moi %s \!
+hello.type.loud=HEI %s \!\!\!
 hello=Hei
