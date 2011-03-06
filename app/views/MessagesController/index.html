@@ -69,6 +69,10 @@ tr.odd {
     background-color: #ddd;
 }
 
+tr:hover {
+    background-color: #ffc;
+}
+
 td {
     color: #333;
     padding: 5px;
@@ -158,6 +162,64 @@ form {
     display: none;
 }
 
+tr.selected .value-edit {
+    display: block;
+}
+
+tr.selected .value-view {
+    display: none;
+}
+
+.value-edit {
+    display: none;
+}
+
+.clear { /* generic container (i.e. div) for floating buttons */
+    overflow: hidden;
+    width: 100%;
+}
+
+a.button {
+    background: transparent url('/public/images/bg_button_a.png') no-repeat scroll top right;
+    color: #444;
+    display: block;
+    float: left;
+    font: normal 12px arial, sans-serif;
+    height: 24px;
+    margin-right: 6px;
+    padding-right: 18px; /* sliding doors padding */
+    text-decoration: none;
+}
+
+a.button span {
+    background: transparent url('/public/images/bg_button_span.png') no-repeat;
+    display: block;
+    line-height: 14px;
+    padding: 5px 0 5px 18px;
+}
+
+a.button:active {
+    background-position: bottom right;
+    color: #000;
+    outline: none; /* hide dotted outline in Firefox */
+}
+
+a.button:active span {
+    background-position: bottom left;
+    padding: 6px 0 4px 18px; /* push text down 1px */
+}
+
+.value-edit label input[type="checkbox"] {
+    margin-right: 4px;
+    position: relative;
+    top: 2px;
+}
+
+.value-edit label {
+    margin-bottom: 5px;
+    display: block;
+}
+
 </style>
 </head>
 
@@ -198,7 +260,9 @@ ${flash.success}
                 <tr class="${key_parity}">
                     <td class="key">#{include '_keyWithSources.html'/}</td>
                     <td class="default"><p>${defaultLocalizations.get(key)}</p></td>
-                    <td class="message"><textarea rows="3" cols="40" name="values[${key}]"></textarea></td>
+                    <td class="message">
+                        #{include '_valueWithEdit.html'/}
+                    </td>
                     <td class="action"><input type="checkbox" value="${key}" name="ignoreList"/></td>
                     <td class="action"><input type="checkbox" value="${key}" name="keepList" #{if keepList.contains(key)}checked#{/if}/></td>
                 </tr>
@@ -332,6 +396,12 @@ $(function(){
                        + '</tr>');
         }
         return false;
+    });
+
+    $("tbody tr").click(function() {
+        if ($("tbody tr.selected").length == 0) {
+            $(this).addClass("selected");
+        }
     });
     $("#tabs").tabs();
     $("form").show();

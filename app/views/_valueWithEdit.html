@@ -1,0 +1,12 @@
+<div class="value-view">
+    ${localizations.get(key)}
+</div>
+<div class="value-edit">
+    <textarea rows="3" cols="40" name="values[${key}]"></textarea>
+    <div class="actions">
+        <label><input type="checkbox" value="${key}" name="keepList" #{if keepList.contains(key)}checked#{/if}/>Keep</label>
+        <div class="clear">
+            <a class="button save" href="#"><span>Save</span></a><a class="button cancel" href="#"><span>Cancel</span></a>
+        </div>
+    </div>
+</div>
