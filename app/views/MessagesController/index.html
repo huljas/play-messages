@@ -24,8 +24,13 @@ table {
     text-align: left;
 }
 
-td, th {
+th {
     border: 1px solid #aaa;
+}
+
+td {
+    border-left: 1px solid #D0D0D0;
+    border-right: 1px solid #D0D0D0;
 }
 
 td.key {
@@ -46,16 +51,11 @@ td.action {
 
 
 textarea {
-    border: 1px solid #666;
+    border: 1px solid #fa4;
     width: 99%;
-    background-color: #eee;
-    color: #555;
-    padding: 3px;
-}
-
-textarea:focus {
-    background-color: #ffe;
+    background-color: #fff;
     color: #333;
+    padding: 3px;
 }
 
 th {
@@ -66,7 +66,7 @@ th {
 }
 
 tr.odd {
-    background-color: #ddd;
+    background-color: #e9e9ff;
 }
 
 tr:hover {
@@ -162,18 +162,6 @@ form {
     display: none;
 }
 
-tr.selected .value-edit {
-    display: block;
-}
-
-tr.selected .value-view {
-    display: none;
-}
-
-.value-edit {
-    display: none;
-}
-
 .clear { /* generic container (i.e. div) for floating buttons */
     overflow: hidden;
     width: 100%;
@@ -209,6 +197,30 @@ a.button:active span {
     padding: 6px 0 4px 18px; /* push text down 1px */
 }
 
+.value-edit {
+    display: none;
+    position: relative;
+}
+
+.value-view {
+    font-family: "Lucida Sans Unicode","Lucida Grande",Sans-Serif;
+
+}
+
+tr.selected {
+    border-top: 2px solid #bb7;
+    border-bottom: 2px solid #bb7;
+    background-color: #ffc;
+}
+
+tr.selected .value-edit {
+    display: block;
+}
+
+tr.selected .value-view {
+    display: none;
+}
+
 .value-edit label input[type="checkbox"] {
     margin-right: 4px;
     position: relative;
@@ -216,8 +228,22 @@ a.button:active span {
 }
 
 .value-edit label {
-    margin-bottom: 5px;
     display: block;
+    float: left;
+    margin-bottom: 5px;
+    margin-right: 11px;
+}
+
+.value-edit .actions {
+    -moz-border-radius: 0 0 4px 4px;
+    background-color: #FFFFCC;
+    border-bottom: 2px solid #BBBB77;
+    border-left: 2px solid #BBBB77;
+    border-right: 2px solid #BBBB77;
+    bottom: -35px;
+    left: -2px;
+    padding: 2px 0;
+    position: absolute;
 }
 
 </style>
@@ -399,10 +425,29 @@ $(function(){
     });
 
     $("tbody tr").click(function() {
-        if ($("tbody tr.selected").length == 0) {
-            $(this).addClass("selected");
-        }
+        $("tbody tr.selected").removeClass("selected");
+        $(this).addClass("selected");
     });
+    $(".actions .save").click(function() {
+        var tr = $(this).closest("tr");
+        tr.removeClass("selected");
+        tr.find("td .value-view").html('<p class="loading">Loading ...</p>');
+
+        var parent = $(this).closest(".value-edit");
+        var args = parent.find("input, textarea").serializeArray();
+        var url = "@{ajaxSave}";
+        tr.find("td .value-view").load(url, args);
+        return false;
+    });
+    $(".actions .cancel").click(function() {
+        var parent = $(this).closest(".value-edit");
+        var value = parent.prev().html();
+        parent.find("textarea").val(value);
+        var tr = $(this).closest("tr");
+        tr.removeClass("selected");
+        return false;
+    });
+    $(".actions .cancel").click()
     $("#tabs").tabs();
     $("form").show();
 });

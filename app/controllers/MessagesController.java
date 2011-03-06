@@ -87,6 +87,23 @@ public class MessagesController extends Controller {
         index(language, defaultLanguage);
     }
 
+    public static void ajaxSave(String language, String key, String value, boolean keep) {
+        if (!StringUtils.isBlank(value) && !StringUtils.isBlank(key)) {
+            MessagesResource messagesResource = MessagesResource.instance();
+            Map<String,String> map = messagesResource.loadMessages(language);
+            map.put(key, value);
+            messagesResource.saveMessages(language, map, Collections.EMPTY_LIST);
+            if (keep) {
+                List<String> keepList = messagesResource.loadKeepList();
+                if (!keepList.contains(key)) {
+                    keepList.add(key);
+                    messagesResource.saveKeepList(keepList);
+                }
+            }
+        }
+        render(value);
+    }
+
     private static List<String> removeDuplicates(List<String> list) {
         if (list == null) {
             return Collections.EMPTY_LIST;

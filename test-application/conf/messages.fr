@@ -1,0 +1,6 @@
+# Saved by @messages on Sun Mar 06 18:53:33 EET 2011
+changeLang=Change languaga
+giveYourName=Give e nome
+happy=happie
+hello.type.happy=Aapiskukko\r\n\r\n\r\nKoira ja kissa, joo
+hello.type.loud=\r\n    <pre></pre>\r\n
