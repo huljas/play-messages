@@ -5,12 +5,17 @@
     <meta charset="utf-8"/>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="@{'/public/javascripts/fg.menu.js'}" type="text/javascript" charset="utf-8"></script>
     <link rel="stylesheet" href="@{'/public/stylesheets/smoothness/jquery-ui-1.8.8.custom.css'}">
 
 <style>
 body {
-    font-family: "Lucida Sans Unicode","Lucida Grande",Sans-Serif;
+    font-family: arial,Sans-Serif;
     font-size: 12px;
+}
+
+.ui-widget {
+    font-family: Arial,sans-serif;
 }
 
 #wrap {
@@ -22,6 +27,7 @@ body {
 table {
     border-collapse: collapse;
     text-align: left;
+    border-bottom: 1px solid #D0D0D0;
 }
 
 th {
@@ -191,6 +197,21 @@ a.button span {
     padding: 5px 0 5px 18px;
 }
 
+a.button span.icon {
+    position: relative;
+    padding-left: 20px;
+}
+
+a.button:active span.icon {
+    padding-left: 20px;
+}
+
+a.button span .ui-icon {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+}
+
 a.button:active {
     background-position: bottom right;
     color: #000;
@@ -251,18 +272,23 @@ tr.selected .value-view {
     position: absolute;
 }
 
+select.action {
+    float: left;
+    margin: 1px 2px 11px 9px;
+}
+
 </style>
 </head>
 
 <body>
 <div id="wrap">
 
-#{if flash.success}
-<div class="success">
-${flash.success}
-</div>
-#{/if}
+    #{if flash.success}
+        <div class="success">${flash.success}</div>
+    #{/if}
 
+<input type="hidden" name="language" value="${language}"/>
+<input type="hidden" name="defaultLanguage" value="${defaultLanguage}"/>
 
 <div id="tabs">
     <ul>
@@ -270,49 +296,20 @@ ${flash.success}
         <li><a href="#tab-2">Existing (${existingKeys.size()})</a></li>
         <li><a href="#tab-3">Obsolete (${obsoleteKeys.size()})</a></li>
     </ul>
-        <input type="hidden" name="language" value="${language}"/>
-        <input type="hidden" name="defaultLanguage" value="${defaultLanguage}"/>
 
         <div id="tab-1">
             <h3>New keys</h3>
 
-            #{form @applyChanges()}
+            <a id="add-key" class="button" href="#"><span class="icon"><b class="ui-icon ui-icon-circle-plus"></b>Add new key</span></a>
 
-            <div class="action-menu">
-            <a href="#" class="button action"><span>Select items to apply actions</span></a>
-            <ul class="menu-list">
-                <li>Remove</li>
-                <li>Ignore</li>
-                <li>Unignore</li>
-            </ul>
-            </div>
+            %{
+                keys = newKeys;
+                tableId = "new-keys";
+            }%
 
-            <table id="new-keys" border="0" cell-spacing="0">
-                <thead>
-                <tr>
-                    <th><input type="checkbox" class="check-all"/></th>
-                    <th>Key</th>
-                    <th>Compare #{include '_compareSelector.html'/}</th>
-                    <th>Edit #{include '_targetSelector.html'/}</th>
-                </tr>
-                </thead>
-                <tbody>
-                #{list items:newKeys.sort(),as:'key'}
-                <tr class="${key_parity}">
-                    <td class="action"><input type="checkbox" name="keys" value="${key}"/></td>
-                    <td class="key">#{include '_keyWithSources.html'/}</td>
-                    <td class="default"><pre>${defaultLocalizations.get(key)}</pre></td>
-                    <td class="message">
-                        #{include '_valueWithEdit.html'/}
-                    </td>
-                </tr>
-                #{/list}
-                </tbody>
-            </table>
+            #{include '_table.html'/}
 
-            #{/form}
 
-            <a id="add-key" href="#">Add new key</a>
 
             <br>
 
@@ -408,7 +405,7 @@ $(function(){
         $("#ignored-keys").toggle("fast");
         return false;
     });
-    $("select").bind('click', function() {
+    $("select.language").bind('click', function() {
         if ($(this).data("selected") != $(this).val()) {
             window.location = $(this).find("option:selected").data("href");
         }
@@ -428,11 +425,15 @@ $(function(){
         if (key != null && key != "enter new key" && key != "") {
             var class = $("#new-keys tbody tr").length % 2 == 0 ? "odd" : "even";
             $("#new-keys tbody").append('<tr class="'+class+'">'
-                       + '<td class="key">' + key +'</td>'
-                       + '<td class="default"><p></p></td>'
-                       + '<td class="message"><textarea rows="3" cols="40" name="values[' + key + ']"></textarea></td>'
-                       + '<td class="action"><input type="checkbox" value="${key}" name="ignoreList"/></td>'
-                       + '<td class="action"><input type="checkbox" value="' + key+ '" name="keepList" checked/></td>'
+                       + '<td class="action"><input type="checkbox" name="keys" value="'+key+'"/></td>'
+                       + '<td class="key"><label class="messages-key">'+key+'</label><div class="sources" style="display:none"></div></td>'
+                       + '<td class="default"><pre></pre></td>'
+                       + '<td class="message"><pre class="messages-value"></pre>'
+                       + '<div class="value-edit"><input type="hidden" value="${language}" name="language"/><input type="hidden" value="" name="' + key + '"/>'
+                       + '<textarea rows="3" cols="40" name="value"></textarea><div class="actions clear"><label><input type="checkbox" value="true" name="keep" checked/>Keep</label>'
+                       + '<a class="button save" href="#"><span class="icon"><b class="ui-icon ui-icon-circle-check"></b>Save</span></a>'
+                       + '<a class="button cancel" href="#"><span class="icon"><b class="ui-icon ui-icon-circle-close"></b>Cancel</span></a>'
+                       + '</div></div></td>'
                        + '</tr>');
         }
         return false;
@@ -441,6 +442,9 @@ $(function(){
     $("tbody tr").click(function() {
         $("tbody tr.selected").removeClass("selected");
         $(this).addClass("selected");
+        var edit = $("#templates .value-edit").clone();
+        edit.find("input[name='key']").val($(this).find("td.key div.key-with-sources label").html());
+        edit.appendTo($(this).find("td.value"));
     });
     $(".actions .save").click(function() {
         var tr = $(this).closest("tr");
@@ -460,6 +464,7 @@ $(function(){
         tr.removeClass("selected");
         return false;
     });
+
     $("#tabs").tabs();
     $("form").show();
 });
