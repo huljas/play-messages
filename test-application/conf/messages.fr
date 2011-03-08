@@ -1,6 +1,5 @@
-# Saved by @messages on Sun Mar 06 18:53:33 EET 2011
+# Saved by @messages on Tue Mar 08 21:53:46 EET 2011
 changeLang=Change languaga
 giveYourName=Give e nome
-happy=happie
-hello.type.happy=Aapiskukko\r\n\r\n\r\nKoira ja kissa, joo
-
+happy=happieL
+hello.type.happy=Aapiskukko\r\n\r\n\r\nKoira ja kissa, joo

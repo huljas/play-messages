@@ -34,16 +34,16 @@ public class MessagesController extends Controller {
             language = defaultLanguage;
         }
         MessagesResource messagesResource = MessagesResource.instance();
-        Map<String,String> localizations = messagesResource.loadMessages(language);
-        Map<String,String> defaultLocalizations = messagesResource.loadMessages(defaultLanguage);
+        Map<String,String> values = messagesResource.loadMessages(language);
+        Map<String,String> defaultValues = messagesResource.loadMessages(defaultLanguage);
         List<String> keepList = messagesResource.loadKeepList();
         List<String> ignoreList = messagesResource.loadIgnoreList();
 
         SourceKeys sources = SourceKeys.lookUp();
 
-        Collection<String> newKeys = MessagesUtil.getNewKeys(sources, localizations);
-        Collection<String> obsoleteKeys = MessagesUtil.getObsoleteKeys(sources, localizations);
-        Collection<String> existingKeys = MessagesUtil.getExistingKeys(sources, localizations);
+        Collection<String> newKeys = MessagesUtil.getNewKeys(sources, values);
+        Collection<String> obsoleteKeys = MessagesUtil.getObsoleteKeys(sources, values);
+        Collection<String> existingKeys = MessagesUtil.getExistingKeys(sources, values);
 
         for (String key : keepList) {
             if (obsoleteKeys.contains(key) || existingKeys.contains(key)) {
@@ -55,7 +55,7 @@ public class MessagesController extends Controller {
         obsoleteKeys.removeAll(keepList);
         newKeys.removeAll(ignoreList);
 
-        render(language, defaultLanguage, localizations, defaultLocalizations, sources, newKeys, existingKeys, obsoleteKeys, keepList, ignoreList);
+        render(language, defaultLanguage, values, defaultValues, sources, newKeys, existingKeys, obsoleteKeys, keepList, ignoreList);
     }
 
     public static void save(String language, String defaultLanguage, Map<String,String> values, List<String> ignoreList, List<String> removeList, List<String> keepList) throws IOException {
@@ -104,13 +104,6 @@ public class MessagesController extends Controller {
         render(value);
     }
 
-    private static List<String> removeDuplicates(List<String> list) {
-        if (list == null) {
-            return Collections.EMPTY_LIST;
-        }
-        return new ArrayList<String>(new HashSet<String>(list));
-    }
-
     public static void applyChanges(String language, String defaultLanguage, MessagesAction action, List<String> keys) {
         if (action == MessagesAction.DELETE) {
             MessagesResource messagesResource = MessagesResource.instance();
@@ -129,5 +122,26 @@ public class MessagesController extends Controller {
             messagesResource.saveIgnoreList(ignoreList);
         }
         index(language, defaultLanguage);
+    }
+
+    public static void addKey(String language, String defaultLanguage, String key) {
+        MessagesResource messagesResource = MessagesResource.instance();
+        Map<String,String> localizations = messagesResource.loadMessages(language);
+        Map<String,String> defaultLocalizations = messagesResource.loadMessages(defaultLanguage);
+        List<String> keepList = new ArrayList<String>();
+        keepList.add(key);
+        render("_row.html", localizations, defaultLocalizations, key, keepList);
+    }
+
+    public static void sources(String key) {
+        SourceKeys sources = SourceKeys.lookUp();
+        render(key, sources);
+    }
+
+    private static List<String> removeDuplicates(List<String> list) {
+        if (list == null) {
+            return Collections.EMPTY_LIST;
+        }
+        return new ArrayList<String>(new HashSet<String>(list));
     }
 }

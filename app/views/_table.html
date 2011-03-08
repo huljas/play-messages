@@ -1,13 +1,13 @@
 #{form @applyChanges()}
 
-<select style="float:left" class="action">
+<select style="float:left" class="action" name="action">
     <option selected>Action for selected</option>
     <option disabled>--------------------</option>
     <option value="REMOVE">Remove</option>
     <option value="IGNORE">Ignore</option>
     <option value="UNIGNORE">Unignore</option>
 </select>
-<a href="#" class="button"><span class="icon"><b class="ui-icon ui-icon-circle-check"></b>Apply</span></a>
+<button type="submit" href="#" class="button apply"><span class="icon"><b class="ui-icon ui-icon-circle-check"></b>Apply</span></button>
 
 
 <div style="clear:both"></div>
@@ -15,7 +15,7 @@
 <table id="${tableId}" border="0" cell-spacing="0">
     <thead>
     <tr>
-        <th><input type="checkbox" class="check-all"/></th>
+        <th><input type="checkbox" class="check-all" name="keys"/></th>
         <th>Key</th>
         <th>Compare #{include '_compareSelector.html'/}</th>
         <th>Edit #{include '_targetSelector.html'/}</th>
@@ -23,45 +23,7 @@
     </thead>
     <tbody>
     #{list items:keys.sort(),as:'key'}
-    <tr class="${key_parity}">
-        <td class="action"><input type="checkbox" name="keys" value="${key}"/></td>
-        <td class="key">
-            <div class="key-with-sources" style="position:relative">
-                <label class="messages-key">${key}</label>
-                <div class="sources" style="display:none">
-                    #{if sources.getKeySourceList(key).listSourceFiles().size() > 0}
-                        #{list items:sources.getKeySourceList(key).listSourceFiles(),as:'source'}
-                            <div class="source">
-                                <strong>${source.path}</strong>
-                                #{list items:source.listSnippets(),as:'snippet'}
-                                    <div class="code">${snippet.snippet.raw()}</div>
-                                #{/list}
-                            </div>
-                        #{/list}
-                    #{/if}
-                    #{else}
-                        Key was not found from sources.
-                    #{/else}
-                </div>
-            </div>
-        </td>
-        <td class="default">
-            <pre class="messages-default">${defaultLocalizations.get(key)}</pre>
-        </td>
-        <td class="message">
-            <pre class="messages-value">${localizations.get(key)}</pre>
-            <div class="value-edit">
-                <input type="hidden" value="${language}" name="language"/>
-                <input type="hidden" value="" name="key"/>
-                <textarea rows="3" cols="40" name="value"></textarea>
-                <div class="actions clear">
-                    <label><input type="checkbox" value="true" name="keep" #{if keepList.contains(key)}checked#{/if}/>Keep</label>
-                    <a class="button save" href="#"><span class="icon"><b class="ui-icon ui-icon-circle-check"></b>Save</span></a>
-                    <a class="button cancel" href="#"><span class="icon"><b class="ui-icon ui-icon-circle-close"></b>Cancel</span></a>
-                </div>
-            </div>
-        </td>
-    </tr>
+        #{include '_row.html'/}
     #{/list}
     </tbody>
 </table>

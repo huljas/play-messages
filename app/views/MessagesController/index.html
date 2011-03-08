@@ -5,7 +5,8 @@
     <meta charset="utf-8"/>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
-    <script src="@{'/public/javascripts/fg.menu.js'}" type="text/javascript" charset="utf-8"></script>
+    <script src="@{'/public/javascripts/jquery.scrollTo-1.4.2-min.js'}" type="text/javascript" charset="utf-8"></script>
+
     <link rel="stylesheet" href="@{'/public/stylesheets/smoothness/jquery-ui-1.8.8.custom.css'}">
 
 <style>
@@ -19,7 +20,7 @@ body {
 }
 
 #wrap {
-    margin: 0 auto;
+    margin: 2em auto 10em;
     width: 90%;
     min-width: 600px;
 }
@@ -178,7 +179,16 @@ form {
     width: 100%;
 }
 
-a.button {
+button.button {
+    border: none;
+    padding-right: 15px;
+}
+
+button.button span {
+    top: -1px;
+}
+
+.button {
     background: transparent url('/public/images/bg_button_a.png') no-repeat scroll top right;
     color: #444;
     display: block;
@@ -190,42 +200,45 @@ a.button {
     text-decoration: none;
 }
 
-a.button span {
+.button span {
     background: transparent url('/public/images/bg_button_span.png') no-repeat;
     display: block;
     line-height: 14px;
     padding: 5px 0 5px 18px;
 }
 
-a.button span.icon {
+.button span.icon {
     position: relative;
     padding-left: 20px;
 }
 
-a.button:active span.icon {
+.button:active span.icon {
     padding-left: 20px;
 }
 
-a.button span .ui-icon {
+.button span .ui-icon {
     position: absolute;
     top: 4px;
     left: 4px;
 }
 
-a.button:active {
+.button:active {
     background-position: bottom right;
     color: #000;
     outline: none; /* hide dotted outline in Firefox */
 }
 
-a.button:active span {
+.button:active span {
     background-position: bottom left;
     padding: 6px 0 4px 18px; /* push text down 1px */
 }
 
 .value-edit {
-    display: none;
     position: relative;
+}
+
+.hidden {
+    display: none;
 }
 
 .value-view {
@@ -239,11 +252,11 @@ tr.selected {
     background-color: #ffc;
 }
 
-tr.selected .value-edit {
+tr.selected .hidden {
     display: block;
 }
 
-tr.selected .value-view {
+tr.selected .messages-value {
     display: none;
 }
 
@@ -266,15 +279,24 @@ tr.selected .value-view {
     border-bottom: 2px solid #BBBB77;
     border-left: 2px solid #BBBB77;
     border-right: 2px solid #BBBB77;
-    bottom: -35px;
+    bottom: -34px;
     left: -2px;
-    padding: 2px 0;
+    padding: 0 0 3px;
     position: absolute;
 }
 
 select.action {
     float: left;
     margin: 1px 2px 11px 9px;
+}
+
+#ignored-keys {
+    display: none;
+    margin-top: 11px;
+}
+
+.clear {
+    clear: both;
 }
 
 </style>
@@ -298,7 +320,6 @@ select.action {
     </ul>
 
         <div id="tab-1">
-            <h3>New keys</h3>
 
             <a id="add-key" class="button" href="#"><span class="icon"><b class="ui-icon ui-icon-circle-plus"></b>Add new key</span></a>
 
@@ -306,102 +327,53 @@ select.action {
                 keys = newKeys;
                 tableId = "new-keys";
             }%
-
             #{include '_table.html'/}
-
-
 
             <br>
 
-            <a id="ignore-toggle" href="#">Ignored keys (${ignoreList.size()})</a>
+            <a id="ignore-toggle" class="button" href="#"><span class="icon"><b class="ui-icon ui-icon-triangle-1-e"></b>Ignored keys (${ignoreList.size()})</span></a>
 
-            <div id="ignored-keys" style="display:none;">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Key</th>
-                        <th>Compare #{include '_compareSelector.html'/}</th>
-                        <th>Edit #{include '_targetSelector.html'/}</th>
-                        <th>Ignore</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    #{list items:ignoreList.sort(),as:'key'}
-                    <tr class="${key_parity}">
-                        <td class="key">#{include '_keyWithSources.html'/}</td>
-                        <td class="default"><p>${defaultLocalizations.get(key)}</p></td>
-                        <td class="message"><textarea rows="3" cols="40" name="values[${key}]"></textarea></td>
-                        <td class="action"><input type="checkbox" value="${key}" name="ignoreList" checked/></td>
-                    </tr>
-                    #{/list}
-                    </tbody>
-                </table>
+            <div class="clear"></div>
+
+            <div id="ignored-keys">
+            %{
+                keys = ignoreList;
+            }%
+            #{include '_table.html'/}
             </div>
+
+            <div class="clear"></div>
         </div>
 
         <div id="tab-2">
-            <h3>Existing keys</h3>
-            <table id="existing">
-                <thead>
-                <tr>
-                    <th>Key</th>
-                    <th>Compare #{include '_compareSelector.html'/}</th>
-                    <th>Edit #{include '_targetSelector.html'/}</th>
-                    <th>Remove</th>
-                    <th>Keep</th>
-                </tr>
-                </thead>
-                <tbody>
 
-                #{list items:existingKeys.sort(),as:'key'}
-                <tr class="${key_parity}">
-                    <td class="key">#{include '_keyWithSources.html'/}</td>
-                    <td class="default"><p>${defaultLocalizations.get(key)}</p></td>
-                    <td class="message"><textarea rows="3" cols="40" name="values[${key}]">${localizations.get(key)?.raw()}</textarea></td>
-                    <td class="action"><input type="checkbox" value="${key}" name="removeList"/></td>
-                    <td class="action"><input type="checkbox" value="${key}" name="keepList" #{if keepList.contains(key)}checked#{/if}/></td>
-                </tr>
-                #{/list}
-                </tbody>
-            </table>
+            %{
+                keys = existingKeys;
+                tableId = "existing-keys";
+            }%
+            #{include '_table.html'/}
+
         </div>
 
         <div id="tab-3">
-            <h3>Possibly obsolete keys</h3>
-            <table id="obsolete">
-                <thead>
-                <tr>
-                    <th>Key</th>
-                    <th>Compare #{include '_compareSelector.html'/}</th>
-                    <th>Edit #{include '_targetSelector.html'/}</th>
-                    <th>Remove</th>
-                    <th>Keep</th>
-                </tr>
-                </thead>
-                <tbody>
-                #{list items:obsoleteKeys.sort(),as:'key'}
-                <tr class="${key_parity}">
-                    <td class="key">#{include '_keyWithSources.html'/}</td>
-                    <td class="default"><p>${defaultLocalizations.get(key)}</p></td>
-                    <td class="message"><textarea rows="3" cols="40" name="values[${key}]">${localizations.get(key).raw()}</textarea></td>
-                    <td class="action"><input type="checkbox" value="${key}" name="removeList"/></td>
-                    <td class="action"><input type="checkbox" value="${key}" name="keepList"/></td>
-                </tr>
-                #{/list}
-                </tbody>
-            </table>
+
+            %{
+                keys = obsoleteKeys;
+                tableId = "obsolete-keys";
+            }%
+            #{include '_table.html'/}
+
         </div>
 </div>
 
 </div>
 
+<div id="sources"></div>
+
 <script type="text/javascript">
 $(function(){
-    $("td.key").click(function(){
-        $(this).children("em").toggle('fast');
-    return false;
-    });
     $("#ignore-toggle").click(function() {
+        $(this).find("b").toggleClass("ui-icon-triangle-1-e").toggleClass("ui-icon-triangle-1-s");
         $("#ignored-keys").toggle("fast");
         return false;
     });
@@ -410,43 +382,29 @@ $(function(){
             window.location = $(this).find("option:selected").data("href");
         }
     });
-    $("td.key").click(function() {
-        if ($(this).find(".sources:hidden").length > 0) {
-            $(".key-with-sources .sources:visible").hide();
-            $(this).find(".sources").show();
-        } else {
-            $(".key-with-sources .sources:visible").hide();
-        }
-    });
 
     $("#add-key").click(function() {
         var key = prompt("Key", "enter new key");
         key = $.trim(key);
         if (key != null && key != "enter new key" && key != "") {
-            var class = $("#new-keys tbody tr").length % 2 == 0 ? "odd" : "even";
-            $("#new-keys tbody").append('<tr class="'+class+'">'
-                       + '<td class="action"><input type="checkbox" name="keys" value="'+key+'"/></td>'
-                       + '<td class="key"><label class="messages-key">'+key+'</label><div class="sources" style="display:none"></div></td>'
-                       + '<td class="default"><pre></pre></td>'
-                       + '<td class="message"><pre class="messages-value"></pre>'
-                       + '<div class="value-edit"><input type="hidden" value="${language}" name="language"/><input type="hidden" value="" name="' + key + '"/>'
-                       + '<textarea rows="3" cols="40" name="value"></textarea><div class="actions clear"><label><input type="checkbox" value="true" name="keep" checked/>Keep</label>'
-                       + '<a class="button save" href="#"><span class="icon"><b class="ui-icon ui-icon-circle-check"></b>Save</span></a>'
-                       + '<a class="button cancel" href="#"><span class="icon"><b class="ui-icon ui-icon-circle-close"></b>Cancel</span></a>'
-                       + '</div></div></td>'
-                       + '</tr>');
+            $.ajax({url:'@{addKey}',type:'POST',
+                data:{key:key,language:'${language}',defaultLanguage:'${defaultLanguage}'},
+                success : function(data) {
+                    $("#new-keys tbody").append(data);
+                    $("#new-keys tbody tr:last").addClass( $("#new-keys tbody tr").length % 2 == 0 ? "even" : "odd" );
+                    $("#new-keys tbody tr:last").click();
+                    $("#new-keys tbody tr:last").find("textarea").focus();
+                }
+            });
         }
         return false;
     });
 
-    $("tbody tr").click(function() {
+    $("tbody tr td:not(.action)").live('click', function() {
         $("tbody tr.selected").removeClass("selected");
-        $(this).addClass("selected");
-        var edit = $("#templates .value-edit").clone();
-        edit.find("input[name='key']").val($(this).find("td.key div.key-with-sources label").html());
-        edit.appendTo($(this).find("td.value"));
+        $(this).closest("tr").addClass("selected");
     });
-    $(".actions .save").click(function() {
+    $(".actions .save").live('click', function() {
         var tr = $(this).closest("tr");
         tr.removeClass("selected");
         tr.find("td .value-view").html('<p class="loading">Loading ...</p>');
@@ -454,17 +412,32 @@ $(function(){
         var parent = $(this).closest(".value-edit");
         var args = parent.find("input, textarea").serializeArray();
         var url = "@{ajaxSave}";
-        tr.find("td .value-view").load(url, args);
+        tr.find("pre.messages-value").load(url, args);
         return false;
     });
-    $(".actions .cancel").click(function() {
+    $(".actions .cancel").live('click', function() {
         var tr = $(this).closest("tr");
-        var value = tr.find(".value-view pre").html();
+        var value = tr.find("pre.messages-value").html();
         tr.find(".value-edit textarea").val(value);
         tr.removeClass("selected");
         return false;
     });
 
+    $(".check-all").click(function() {
+        if ($(this).is(":checked")) {
+            $(this).closest("table").find("input.key-check").attr("checked", "checked");
+        } else {
+            $(this).closest("table").find("input.key-check").removeAttr("checked");
+        }
+    });
+
+    $(".show-sources").click(function() {
+        var key = $(this).closest("td").find("input[name='key']").val();
+        $("#sources").dialog('open').dialog('option', {title:'Usage of key "'+key+'"'});
+        $("#sources").html('<p class="loading">Loading</p>').load('@{sources}', {key:key});
+    });
+
+    $("#sources").dialog({autoOpen:false, modal:true, width: 800, minHeight: 200});
     $("#tabs").tabs();
     $("form").show();
 });
