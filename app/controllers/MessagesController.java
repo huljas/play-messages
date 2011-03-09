@@ -93,10 +93,15 @@ public class MessagesController extends Controller {
             Map<String,String> map = messagesResource.loadMessages(language);
             map.put(key, value);
             messagesResource.saveMessages(language, map, Collections.EMPTY_LIST);
+            List<String> keepList = messagesResource.loadKeepList();
             if (keep) {
-                List<String> keepList = messagesResource.loadKeepList();
                 if (!keepList.contains(key)) {
                     keepList.add(key);
+                    messagesResource.saveKeepList(keepList);
+                }
+            } else {
+                if (keepList.contains(key)) {
+                    keepList.remove(key);
                     messagesResource.saveKeepList(keepList);
                 }
             }

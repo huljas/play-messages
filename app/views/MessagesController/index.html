@@ -60,8 +60,6 @@ td.action {
     text-align: center;
 }
 
-
-
 textarea {
     border: 1px solid #fa4;
     width: 99%;
@@ -125,9 +123,10 @@ select {
 }
 
 .line {
-    font-family: 'Bitstream Vera Sans Mono','Courier',monospace;
+    font-family: 'Lucida console','Courier',monospace;
     color: #333;
-    line-height: 14px;
+    line-height: 19px;
+    font-size: 14px;
 }
 
 .line pre {
@@ -136,27 +135,21 @@ select {
 }
 
 .line pre.lno {
-    color: #f5d;
+    border-right: 2px solid #33DD33;
+    color: #999999;
     margin-right: 3px;
-    background-color: #333;
-}
-
-.line.odd {
-    background-color: #fff;
-}
-
-.line.even {
-    background-color: #ddd;
+    padding: 1px 0 2px;
 }
 
 .line.focus {
-    background-color: #FF88DD;
-    color: #882244;
+    background-color: #CCCCEE;
 }
 
 .line pre.k {
-    color: #054A10;
+    background-color: #FF0000;
+    color: #FFFAF0;
     font-weight: bold;
+    padding: 0 3px;
 }
 
 .success {
@@ -186,6 +179,7 @@ button.button {
 
 button.button span {
     top: -1px;
+    font-family: arial;
 }
 
 .button {
@@ -290,13 +284,29 @@ select.action {
     margin: 1px 2px 11px 9px;
 }
 
-#ignored-keys {
+#ignored-target {
     display: none;
     margin-top: 11px;
 }
 
 .clear {
     clear: both;
+}
+
+#new-keys .remove-option, #new-keys .unignore-option {
+    display: none;
+}
+
+#ignored-keys .ignore-option {
+    display: none;
+}
+
+#existing-keys .ignore-option, #existing-keys .unignore-option {
+    display: none;
+}
+
+#obsolete-keys .ignore-option, #obsolete-keys .unignore-option {
+    display: none;
 }
 
 </style>
@@ -335,9 +345,10 @@ select.action {
 
             <div class="clear"></div>
 
-            <div id="ignored-keys">
+            <div id="ignored-target">
             %{
                 keys = ignoreList;
+                tableId = 'ignored-keys';
             }%
             #{include '_table.html'/}
             </div>
@@ -368,13 +379,15 @@ select.action {
 
 </div>
 
-<div id="sources"></div>
+<div id="sources">
+    <div id="sources-target"></div>
+</div>
 
 <script type="text/javascript">
 $(function(){
     $("#ignore-toggle").click(function() {
         $(this).find("b").toggleClass("ui-icon-triangle-1-e").toggleClass("ui-icon-triangle-1-s");
-        $("#ignored-keys").toggle("fast");
+        $("#ignored-target").toggle("fast");
         return false;
     });
     $("select.language").bind('click', function() {
@@ -407,12 +420,14 @@ $(function(){
     $(".actions .save").live('click', function() {
         var tr = $(this).closest("tr");
         tr.removeClass("selected");
-        tr.find("td .value-view").html('<p class="loading">Loading ...</p>');
+        tr.find("pre.messages-value").html('<p class="loading">Loading ...</p>');
 
         var parent = $(this).closest(".value-edit");
         var args = parent.find("input, textarea").serializeArray();
         var url = "@{ajaxSave}";
-        tr.find("pre.messages-value").load(url, args);
+        tr.find("pre.messages-value").load(url, args, function() {
+            tr.effect('pulsate', {times: 3}, 500);
+        });
         return false;
     });
     $(".actions .cancel").live('click', function() {
@@ -423,21 +438,36 @@ $(function(){
         return false;
     });
 
+    var updateCount = function(form) {
+        var count = form.find("input.key-check:checked").length;
+        if (count == 1) {
+            form.find(".title-option").html("Action for selected " + count + " item");
+        } else {
+            form.find(".title-option").html("Action for selected " + count + " items");
+        }
+    };
+
     $(".check-all").click(function() {
         if ($(this).is(":checked")) {
             $(this).closest("table").find("input.key-check").attr("checked", "checked");
         } else {
             $(this).closest("table").find("input.key-check").removeAttr("checked");
         }
+        updateCount($(this).closest("form"));
+    });
+
+    $("input.key-check").live('click', function() {
+        updateCount($(this).closest("form"));
     });
 
     $(".show-sources").click(function() {
         var key = $(this).closest("td").find("input[name='key']").val();
-        $("#sources").dialog('open').dialog('option', {title:'Usage of key "'+key+'"'});
-        $("#sources").html('<p class="loading">Loading</p>').load('@{sources}', {key:key});
+        $("#sources").dialog('open').dialog('option', {title:'Usage of key "'+key+'"', maxHeight: 600});
+        $("#sources-target").html('<p class="loading">Loading</p>').load('@{sources}', {key:key});
+        return false;
     });
 
-    $("#sources").dialog({autoOpen:false, modal:true, width: 800, minHeight: 200});
+    $("#sources").dialog({autoOpen:false, modal:true, width: 800, height: 600});
     $("#tabs").tabs();
     $("form").show();
 });

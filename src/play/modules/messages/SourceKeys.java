@@ -56,7 +56,7 @@ public class SourceKeys {
             if (i == line) {
                 s = s.replace(key, "</pre><pre class=\"k\">" + key + "</pre><pre class=\"co\">");
             }
-            snippet.append("<div class=\"line").append(i % 2 == 0 ? " even" : " odd").append(i == line ? " focus" : "").append("\"><pre class=\"lno\">").append(String.format("% 4d", line + 1)).append(":</pre><pre class=\"co\">").append(s).append("</pre></div>");
+            snippet.append("<div class=\"line").append(i % 2 == 0 ? " even" : " odd").append(i == line ? " focus" : "").append("\"><pre class=\"lno\">").append(String.format("% 4d", i + 1)).append(":</pre><pre class=\"co\">").append(s).append("</pre></div>");
         }
         return snippet.toString();
     }
