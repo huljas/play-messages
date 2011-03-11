@@ -21,6 +21,7 @@ public class DefaultMessagesResource extends MessagesResource {
         targetDir = new File(Play.configuration.getProperty("messages.targetDir", "conf"));
     }
 
+    @Override
     public List<String> loadKeepList() {
         try {
             File file = new File(targetDir, "messages.keep");
@@ -33,6 +34,7 @@ public class DefaultMessagesResource extends MessagesResource {
         }
     }
 
+    @Override
     public List<String> loadIgnoreList() {
         try {
             File file = new File(targetDir, "messages.ignore");
@@ -45,6 +47,7 @@ public class DefaultMessagesResource extends MessagesResource {
         }
     }
 
+    @Override
     public Map<String, String> loadMessages(String language) {
         try {
             File file = new File(targetDir, "messages." + language);
@@ -57,7 +60,54 @@ public class DefaultMessagesResource extends MessagesResource {
         }
     }
 
-    public void saveKeepList(List<String> list) {
+    @Override
+    public void save(String language, String key, String value) {
+        Map<String,String> messages = loadMessages(language);
+        messages.put(key, value);
+        saveMessages(language, messages);
+    }
+
+    @Override
+    public void keep(String key) {
+        List<String> keepList = loadKeepList();
+        if (!keepList.contains(key)) {
+            keepList.add(key);
+            saveKeepList(keepList);
+        }
+    }
+
+    @Override
+    public void removeKeep(String key) {
+        List<String> keepList = loadKeepList();
+        if (keepList.contains(key)) {
+            keepList.remove(key);
+            saveKeepList(keepList);
+        }
+    }
+
+    @Override
+    public void removeAll(String language, List<String> keys) {
+        Map<String, String> messages = loadMessages(language);
+        messages.keySet().removeAll(keys);
+        saveMessages(language, messages);
+    }
+
+    @Override
+    public void ignoreAll(List<String> keys) {
+        List<String> ignoreList = loadIgnoreList();
+        ignoreList.removeAll(keys);
+        ignoreList.addAll(keys);
+        saveIgnoreList(ignoreList);
+    }
+
+    @Override
+    public void unignoreAll(List<String> keys) {
+        List<String> ignoreList = loadIgnoreList();
+        ignoreList.removeAll(keys);
+        saveIgnoreList(ignoreList);
+    }
+
+    protected void saveKeepList(List<String> list) {
         File file = new File(targetDir, "messages.keep");
         try {
             Collections.sort(list);
@@ -69,7 +119,7 @@ public class DefaultMessagesResource extends MessagesResource {
         }
     }
 
-    public void saveIgnoreList(List<String> list) {
+    protected void saveIgnoreList(List<String> list) {
         File file = new File(targetDir, "messages.ignore");
         try {
             Collections.sort(list);
@@ -81,15 +131,12 @@ public class DefaultMessagesResource extends MessagesResource {
         }
     }
 
-    public void saveMessages(String language, Map<String, String> messages, List<String> removeList) {
+    protected void saveMessages(String language, Map<String, String> messages) {
         try {
             File file = new File(targetDir, "messages." + language);
             BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
             Properties properties = new Properties();
             properties.putAll(messages);
-            for (String key : removeList) {
-                properties.remove(key);
-            }
             // This is ugly but the properties string formatting is so weird that I don't want to
             // start messing around with it.
             ByteArrayOutputStream baos = new ByteArrayOutputStream();

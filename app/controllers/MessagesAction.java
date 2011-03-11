@@ -4,6 +4,6 @@ package controllers;
  * @author huljas
  */
 public enum MessagesAction {
-    DELETE,
+    REMOVE,
     UNIGNORE, IGNORE
 }

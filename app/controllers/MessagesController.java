@@ -1,16 +1,13 @@
 package controllers;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import play.Play;
-import play.i18n.Messages;
 import play.modules.messages.MessagesResource;
 import play.modules.messages.MessagesUtil;
 import play.modules.messages.SourceKeys;
 import play.mvc.Before;
 import play.mvc.Controller;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -58,84 +55,40 @@ public class MessagesController extends Controller {
         render(language, defaultLanguage, values, defaultValues, sources, newKeys, existingKeys, obsoleteKeys, keepList, ignoreList);
     }
 
-    public static void save(String language, String defaultLanguage, Map<String,String> values, List<String> ignoreList, List<String> removeList, List<String> keepList) throws IOException {
-        ignoreList = removeDuplicates(ignoreList);
-        removeList = removeDuplicates(removeList);
-        keepList = removeDuplicates(keepList);
-        MessagesResource messagesResource = MessagesResource.instance();
-        Map<String,String> map = messagesResource.loadMessages(language);
-
-        for (Map.Entry<String,String> entry : values.entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
-            if (!StringUtils.isBlank(value)) {
-                map.put(key, value);
-            }
-        }
-        for (String key : ignoreList) {
-            map.remove(key);
-        }
-        for (String key : removeList) {
-            map.remove(key);
-        }
-        messagesResource.saveMessages(language, map, removeList);
-        messagesResource.saveIgnoreList(ignoreList);
-        messagesResource.saveKeepList(keepList);
-
-        flash.success("Messages saved successfully!");
-
-        index(language, defaultLanguage);
-    }
-
-    public static void ajaxSave(String language, String key, String value, boolean keep) {
+    public static void save(String language, String key, String value, boolean keep) {
         if (!StringUtils.isBlank(value) && !StringUtils.isBlank(key)) {
             MessagesResource messagesResource = MessagesResource.instance();
-            Map<String,String> map = messagesResource.loadMessages(language);
-            map.put(key, value);
-            messagesResource.saveMessages(language, map, Collections.EMPTY_LIST);
-            List<String> keepList = messagesResource.loadKeepList();
+            messagesResource.save(language, key, value);
             if (keep) {
-                if (!keepList.contains(key)) {
-                    keepList.add(key);
-                    messagesResource.saveKeepList(keepList);
-                }
+                messagesResource.keep(key);
             } else {
-                if (keepList.contains(key)) {
-                    keepList.remove(key);
-                    messagesResource.saveKeepList(keepList);
-                }
+                messagesResource.removeKeep(key);
             }
         }
         render(value);
     }
 
     public static void applyChanges(String language, String defaultLanguage, MessagesAction action, List<String> keys) {
-        if (action == MessagesAction.DELETE) {
+        if (action == MessagesAction.REMOVE) {
             MessagesResource messagesResource = MessagesResource.instance();
-            Map<String,String> map = messagesResource.loadMessages(language);
-            messagesResource.saveMessages(language, map, keys);
+            messagesResource.removeAll(language, keys);
         } else if (action == MessagesAction.IGNORE) {
             MessagesResource messagesResource = MessagesResource.instance();
-            List<String> ignoreList = messagesResource.loadIgnoreList();
-            ignoreList.removeAll(keys);
-            ignoreList.addAll(keys);
-            messagesResource.saveIgnoreList(ignoreList);
+            messagesResource.ignoreAll(keys);
         } else if (action == MessagesAction.UNIGNORE) {
             MessagesResource messagesResource = MessagesResource.instance();
-            List<String> ignoreList = messagesResource.loadIgnoreList();
-            ignoreList.removeAll(keys);
-            messagesResource.saveIgnoreList(ignoreList);
+            messagesResource.unignoreAll(keys);
         }
         index(language, defaultLanguage);
     }
 
     public static void addKey(String language, String defaultLanguage, String key) {
         MessagesResource messagesResource = MessagesResource.instance();
-        Map<String,String> localizations = messagesResource.loadMessages(language);
-        Map<String,String> defaultLocalizations = messagesResource.loadMessages(defaultLanguage);
+        Map<String,String> values = messagesResource.loadMessages(language);
+        Map<String,String> defaultValues = messagesResource.loadMessages(defaultLanguage);
         List<String> keepList = new ArrayList<String>();
         keepList.add(key);
-        render("_row.html", localizations, defaultLocalizations, key, keepList);
+        render("_row.html", language, defaultLanguage, values, defaultValues, key, keepList);
     }
 
     public static void sources(String key) {

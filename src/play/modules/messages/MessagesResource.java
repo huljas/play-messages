@@ -46,21 +46,35 @@ public abstract class MessagesResource {
      */
     public abstract Map<String,String> loadMessages(String language);
 
-    /**
-     * Saves the keep list.
-     */
-    public abstract void saveKeepList(List<String> keepList);
 
     /**
-     * Saves the ignore list.
+     * Saves new value for given key.
      */
-    public abstract void saveIgnoreList(List<String> ignoreList);
+    public abstract void save(String language, String key, String value);
 
     /**
-     * Saves messages for given language.
-     * @param language The language code
-     * @param messages The messages in a map
-     * @param removedList Keys to be removed
+     * Adds key to keep list.
      */
-    public abstract void saveMessages(String language, Map<String,String> messages, List<String> removedList);
+    public abstract void keep(String key);
+
+    /**
+     * Removes key from keep list.
+     */
+    public abstract void removeKeep(String key);
+
+    /**
+     * Removes given keys.
+     */
+    public abstract void removeAll(String language, List<String> keys);
+
+    /**
+     * Ignores given keys.
+     */
+    public abstract void ignoreAll(List<String> keys);
+
+    /**
+     * Unignores given keys.
+     */
+    public abstract void unignoreAll(List<String> keys);
+
 }

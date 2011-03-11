@@ -11,7 +11,7 @@
         <div class="value-edit hidden">
             <input type="hidden" value="${language}" name="language"/>
             <input type="hidden" value="${key}" name="key"/>
-            <textarea rows="5" cols="40" name="value">${values.get(key)}</textarea>
+            <textarea autocomplete="off" rows="5" cols="40" name="value">${values.get(key)}</textarea>
             <div class="actions clear">
                 <label><input type="checkbox" value="true" name="keep" #{if keepList.contains(key)}checked#{/if}/>Keep</label>
                 <a class="button save" href="#"><span class="icon"><b class="ui-icon ui-icon-circle-check"></b>Save</span></a>
