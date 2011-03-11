@@ -50,7 +50,7 @@
     <target name="package" depends="clean,build">
         <input message="What is the module version number?" addproperty="version"/>
         <input message="What are the playframework versions required?" addproperty="frameworkVersions"/>
-        <echo file="manifest" message="version=${version}\nframeworkVersions=${frameworkVersions}"/>
+        <echo file="manifest" message="version=${version}${line.separator}frameworkVersions=${frameworkVersions}"/>
         <zip destfile="dist/${ant.project.name}-${version}.zip">
             <fileset dir="${basedir}">
                 <include name="app/**"/>
