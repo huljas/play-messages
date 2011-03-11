@@ -63,6 +63,7 @@
                 <include name="manifest"/>
                 <include name="*.py"/>
                 <include name="README*"/>
+                <include name="COPYING"/>
             </fileset>
         </zip>
         <delete file="manifest"/>
