@@ -17,6 +17,10 @@
         </fileset>
     </path>
 
+    <target name="clean">
+        <delete dir="tmp"/>
+    </target>
+
     <target name="build" depends="compile">
         <copy todir="tmp/classes">
             <fileset dir="src">
@@ -26,7 +30,7 @@
                 <include name="**/play.static"/>
             </fileset>
         </copy>
-        <jar destfile="lib/play-messages.jar" basedir="tmp/classes">
+        <jar destfile="lib/${ant.project.name}.jar" basedir="tmp/classes">
             <manifest>
                 <section name="Play-module">
                     <attribute name="Specification-Title" value="play-messages"/>
@@ -41,6 +45,27 @@
         <javac srcdir="src" destdir="tmp/classes" target="1.5" debug="true">
             <classpath refid="project.classpath" />
         </javac>
+    </target>
+
+    <target name="package" depends="clean,build">
+        <input message="What is the module version number?" addproperty="version"/>
+        <input message="What are the playframework versions required?" addproperty="frameworkVersions"/>
+        <echo file="manifest" message="version=${version}\nframeworkVersions=${frameworkVersions}"/>
+        <zip destfile="dist/${ant.project.name}-${version}.zip">
+            <fileset dir="${basedir}">
+                <include name="app/**"/>
+                <include name="src/**"/>
+                <include name="conf/**"/>
+                <include name="public/**"/>
+                <include name="lib/**"/>
+                <include name="documentation/**"/>
+                <include name="build.xml"/>
+                <include name="manifest"/>
+                <include name="*.py"/>
+                <include name="README*"/>
+            </fileset>
+        </zip>
+        <delete file="manifest"/>
     </target>
 
 </project>
