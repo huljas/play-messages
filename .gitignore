@@ -2,3 +2,5 @@
 *.pyc
 *.ipr
 tmp/
+dist/
+lib/messages.jar
