@@ -29,6 +29,8 @@ public class DefaultMessagesResource extends MessagesResource {
             List<String> result = IOUtils.readLines(in, "UTF-8");
             IOUtils.closeQuietly(in);
             return result;
+        } catch (FileNotFoundException e) {
+            return new ArrayList<String>();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -42,6 +44,8 @@ public class DefaultMessagesResource extends MessagesResource {
             List<String> result = IOUtils.readLines(in, "UTF-8");
             IOUtils.closeQuietly(in);
             return result;
+        } catch (FileNotFoundException e) {
+            return new ArrayList<String>();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -56,6 +60,8 @@ public class DefaultMessagesResource extends MessagesResource {
             IOUtils.closeQuietly(in);
             return new HashMap(properties);
         } catch (FileNotFoundException e) {
+            return new HashMap<String,String>();
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -134,7 +140,6 @@ public class DefaultMessagesResource extends MessagesResource {
     protected void saveMessages(String language, Map<String, String> messages) {
         try {
             File file = new File(targetDir, "messages." + language);
-            BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
             Properties properties = new Properties();
             properties.putAll(messages);
             // This is ugly but the properties string formatting is so weird that I don't want to

@@ -1,15 +1,2 @@
-# Created by @messages on Sat Mar 05 13:56:20 EET 2011
-changeLang=Change language
-giveYourName=Give your name ...
-happy=Happy
-hello.type.happy=Hello %s \!
-hello.type.loud=HELLO %s \!\!\!
-hello.type.normal=Hello %s
-hello.type.quick=Hi\!
-loud=LOUD
-normal=Normal
-obsolete.key=Obsolete key
-obsoleteKey=Obsolete key is shown as obsolete since it is not found in the code\!
-quick=quick\!
-sayHello=Say hello\!
-you=You
+# Saved by @messages on Sat Mar 12 19:14:30 EET 2011
+changeLang=Change language

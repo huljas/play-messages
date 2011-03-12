@@ -25,6 +25,9 @@ public class MessagesController extends Controller {
 
     public static void index(String language, String defaultLanguage) {
         if (StringUtils.isBlank(defaultLanguage)) {
+            if (Play.langs.size() == 0) {
+                error(500, "ERROR: Required application.langs property is not set!");
+            }
             defaultLanguage = Play.langs.get(0);
         }
         if (StringUtils.isBlank(language)) {
