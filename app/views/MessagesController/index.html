@@ -5,6 +5,7 @@
     <meta charset="utf-8"/>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
+    #{script 'jquery.cookie.js' /} 
     <link rel="stylesheet" href="@{'/public/stylesheets/smoothness/jquery-ui-1.8.8.custom.css'}">
 <style>
 body {
@@ -387,7 +388,7 @@ $(function(){
         $("#ignored-target").toggle("fast");
         return false;
     });
-    $("select.language").bind('click', function() {
+    $("select.language").bind('change', function() {
         if ($(this).data("selected") != $(this).val()) {
             window.location = $(this).find("option:selected").data("href");
         }
@@ -465,7 +466,12 @@ $(function(){
     });
 
     $("#sources").dialog({autoOpen:false, modal:true, width: 800, height: 600});
-    $("#tabs").tabs();
+    $("#tabs").tabs({
+        cookie: {
+            // store cookie for a day, without, it would be a session cookie
+            //expires: 1
+        }
+    });
     $("form").show();
 });
 </script>
