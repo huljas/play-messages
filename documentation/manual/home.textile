@@ -8,11 +8,19 @@ And next you will need to add the following line to the **conf/routes** file
 
 bc. *     /    module:messages
 
+or this line to the **dependencies.yml** file
+
+bc.     play -> messages 1.1
+
 Then you can access the tool at **http://localhost:9000/@messages**.
 
-h2. New in version 1.0
+h2. New in version 1.1
 
-- New, pimped UI with Ajax
+- Support for default language editing
+- Add regexp for i18n javascript function in order to provide support for messages in javascript files
+- Write selected tab information in a cookie so that selected tab does not change after refresh (Needs jquery.cookie.js)
+- Fix language drop down event binding to "change" instead of "click"
+- Fix language not selected after refresh bug
 
 h2. Message keys lookup
 
