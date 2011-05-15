@@ -24,7 +24,7 @@ public class SourceKeys {
         String s = Play.configuration.getProperty("messages.srcDir", "app");
         String[] paths = s.split(Pattern.quote(","));
         for (String path : paths) {
-            Iterator<File> iterator = FileUtils.iterateFiles(new File(path), new String[]{"java", "html"}, true);
+            Iterator<File> iterator = FileUtils.iterateFiles(new File(path), new String[]{"java", "html", "js"}, true);
             while (iterator.hasNext()) {
                 try {
                     File file = iterator.next();

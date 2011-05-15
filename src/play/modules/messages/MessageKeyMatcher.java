@@ -17,6 +17,7 @@ public class MessageKeyMatcher {
     String REGEXP3 = "\\Q&{\\E[']([^']*)[']";
     String REGEXP4 = "\\Qmessages\\E\\Q.get(\"\\E([^\"]*)\"";
     String REGEXP5 = "\\Qmessages\\E\\Q.get(\'\\E([^\']*)\'";
+    String REGEXP6 = "\\Qi18n(\'\\E([^\']*)\'";
 
     private List<Pattern> patterns = new ArrayList<Pattern>();
 
@@ -26,6 +27,7 @@ public class MessageKeyMatcher {
         patterns.add(Pattern.compile(REGEXP3));
         patterns.add(Pattern.compile(REGEXP4));
         patterns.add(Pattern.compile(REGEXP5));                
+        patterns.add(Pattern.compile(REGEXP6));                
     }
 
     /**
