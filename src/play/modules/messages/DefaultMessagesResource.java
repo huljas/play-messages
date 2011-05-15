@@ -54,7 +54,7 @@ public class DefaultMessagesResource extends MessagesResource {
     @Override
     public Map<String, String> loadMessages(String language) {
         try {
-            File file = new File(targetDir, "messages." + language);
+            File file = getMessagesFile(language);
             BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
             Properties properties = IO.readUtf8Properties(in);
             IOUtils.closeQuietly(in);
@@ -139,7 +139,7 @@ public class DefaultMessagesResource extends MessagesResource {
 
     protected void saveMessages(String language, Map<String, String> messages) {
         try {
-            File file = new File(targetDir, "messages." + language);
+            File file = getMessagesFile(language);
             Properties properties = new Properties();
             properties.putAll(messages);
             // This is ugly but the properties string formatting is so weird that I don't want to
@@ -168,6 +168,14 @@ public class DefaultMessagesResource extends MessagesResource {
             IOUtils.closeQuietly(fileWriter);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private File getMessagesFile(String language) {
+        if (language.equals(DEFAULT_LANGUAGE)) {
+            return new File(targetDir, "messages");
+        } else {
+            return new File(targetDir, "messages." + language);
         }
     }
 }

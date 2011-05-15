@@ -2,7 +2,7 @@
 
 <project name="messages" default="build" basedir=".">
 
-    <property name="play.path" value="c:\code\play"/>
+    <property name="play.path" value="c:\code\play-master\play"/>
 
     <path id="project.classpath">
         <pathelement path="${play.path}/framework/classes"/>

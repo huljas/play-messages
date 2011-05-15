@@ -28,10 +28,10 @@ public class MessagesController extends Controller {
             if (Play.langs.size() == 0) {
                 error(500, "ERROR: Required application.langs property is not set!");
             }
-            defaultLanguage = Play.langs.get(0);
+            defaultLanguage = MessagesResource.DEFAULT_LANGUAGE;
         }
         if (StringUtils.isBlank(language)) {
-            language = defaultLanguage;
+            language = MessagesResource.DEFAULT_LANGUAGE;
         }
         MessagesResource messagesResource = MessagesResource.instance();
         Map<String,String> values = messagesResource.loadMessages(language);
@@ -55,7 +55,10 @@ public class MessagesController extends Controller {
         obsoleteKeys.removeAll(keepList);
         newKeys.removeAll(ignoreList);
 
-        render(language, defaultLanguage, values, defaultValues, sources, newKeys, existingKeys, obsoleteKeys, keepList, ignoreList);
+        List<String> langs = new ArrayList<String>(Play.langs);
+        langs.add("default");
+
+        render(language, defaultLanguage, values, defaultValues, sources, newKeys, existingKeys, obsoleteKeys, keepList, ignoreList, langs);
     }
 
     public static void save(String language, String key, String value, boolean keep) {

@@ -15,6 +15,8 @@ import java.util.Map;
  */
 public abstract class MessagesResource {
 
+    public static String DEFAULT_LANGUAGE = "default";
+
     private static MessagesResource instance;
 
     public static synchronized MessagesResource instance() {
