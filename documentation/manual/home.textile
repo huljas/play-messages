@@ -4,13 +4,13 @@ Module **messages** provides a web based tool for managing your application's lo
 
 bc. module.messages=${play.path}/modules/messages-{version}
 
+or this line to the **dependencies.yml** file
+
+bc.    - play -> messages {version}
+
 And next you will need to add the following line to the **conf/routes** file
 
 bc. *     /    module:messages
-
-or this line to the **dependencies.yml** file
-
-bc.     play -> messages 1.1
 
 Then you can access the tool at **http://localhost:9000/@messages**.
 
