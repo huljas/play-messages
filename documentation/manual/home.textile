@@ -24,9 +24,22 @@ h2. New in version 1.1
 
 h2. Message keys lookup
 
-The tool will use simple regexp to look for localization keys in the application sources. The default path used is **app**, but this can be configured with a property.
+The tool will use simple regexp to look for localization keys in the application sources. The default path used is **app**, but this can be configured with the property **messages.srcDir**. The lookup uses regexp to scan the source files and finds the following patterns:
+bc. // localization in java
+Messages.get("keyname");
+// localization with arguments
+Messages.get("keyname", paramA, paramB);
+// validation error message
+Validation.addError("fieldName", "keyname", param1, param2);
+*{ localization in template }*
+&{'keyname', param1, param2}
+*{ template localization inside a tag }*
+%{  name = messages.get("keyname"); name2 = messages.get('keyname2'); }%
+*{ javascript localization with i18n }*
+#{i18n /}
+<script>alert(i18n('keyname'));</script>
 
-The lookup will work in most cases, but it cannot of course find generated localization keys. For example consider the following code
+The lookup will work in most cases, but it cannot of course find the right value for generated localization keys. For example consider the following code
 
 bc. UserType type = UserType.ADMIN;
 String localizedString = Messages.get("user.type." + userType.name().toLowerCase());
