@@ -6,7 +6,7 @@ import play.i18n.Messages;
 import play.mvc.Controller;
 
 /**
- * @author heikkiu
+ * @author huljas
  */
 public class LocalizedApplication extends Controller {
 
