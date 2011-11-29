@@ -18,7 +18,9 @@ public class DefaultMessagesResource extends MessagesResource {
     File targetDir;
 
     public DefaultMessagesResource() {
-        targetDir = new File(Play.configuration.getProperty("messages.targetDir", "conf"));
+        String applicationPath = Play.applicationPath.getPath();
+        String separator = System.getProperty("file.separator");
+        targetDir = new File(applicationPath + separator + Play.configuration.getProperty("messages.targetDir", "conf"));
     }
 
     @Override
