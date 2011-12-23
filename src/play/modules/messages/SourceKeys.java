@@ -7,6 +7,7 @@ import play.utils.HTML;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -22,9 +23,13 @@ public class SourceKeys {
         SourceKeys foundKeys = new SourceKeys();
         MessageKeyMatcher matcher = new MessageKeyMatcher();
         String s = Play.configuration.getProperty("messages.srcDir", "app");
+
         String[] paths = s.split(Pattern.quote(","));
+        String applicationPath = Play.applicationPath.getPath();
+        String separator = System.getProperty("file.separator");
+
         for (String path : paths) {
-            Iterator<File> iterator = FileUtils.iterateFiles(new File(path), new String[]{"java", "html", "js"}, true);
+            Iterator<File> iterator = FileUtils.iterateFiles(new File(applicationPath + separator + path), new String[]{"java", "html", "js"}, true);
             while (iterator.hasNext()) {
                 try {
                     File file = iterator.next();
