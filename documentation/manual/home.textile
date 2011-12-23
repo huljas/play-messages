@@ -14,6 +14,10 @@ bc. *     /    module:messages
 
 Then you can access the tool at **http://localhost:9000/@messages**.
 
+h2. New in version 1.2
+
+- Support for play path given to the play command
+
 h2. New in version 1.1
 
 - Support for default language editing
