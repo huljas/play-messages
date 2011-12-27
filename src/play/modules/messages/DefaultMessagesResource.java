@@ -22,7 +22,7 @@ public class DefaultMessagesResource extends MessagesResource {
         String applicationPath = Play.applicationPath.getPath();
         String separator = System.getProperty("file.separator");
         targetDir = new File(applicationPath + separator + Play.configuration.getProperty("messages.targetDir", "conf"));
-		defaultLanguage = Play.configuration.getProperty("messages.defaultLanguage", "");
+        defaultLanguage = Play.configuration.getProperty("messages.defaultLanguage", "");
     }
 
     @Override
