@@ -16,11 +16,13 @@ import java.util.*;
 public class DefaultMessagesResource extends MessagesResource {
 
     File targetDir;
+    String defaultLanguage;
 
     public DefaultMessagesResource() {
         String applicationPath = Play.applicationPath.getPath();
         String separator = System.getProperty("file.separator");
         targetDir = new File(applicationPath + separator + Play.configuration.getProperty("messages.targetDir", "conf"));
+		defaultLanguage = Play.configuration.getProperty("messages.defaultLanguage", "");
     }
 
     @Override
@@ -175,7 +177,7 @@ public class DefaultMessagesResource extends MessagesResource {
 
     private File getMessagesFile(String language) {
         if (language.equals(DEFAULT_LANGUAGE)) {
-            return new File(targetDir, "messages");
+            return new File(targetDir, defaultLanguage.isEmpty() ? "messages" : "messages." + defaultLanguage);
         } else {
             return new File(targetDir, "messages." + language);
         }
