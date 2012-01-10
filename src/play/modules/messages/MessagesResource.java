@@ -23,7 +23,7 @@ public abstract class MessagesResource {
         if (instance == null) {
             try {
                 String resourceClass = Play.configuration.getProperty("messages.resource", DefaultMessagesResource.class.getName());
-                Class clazz = Class.forName(resourceClass);
+                Class clazz = Class.forName(resourceClass, true, Play.classloader);
                 instance = (MessagesResource) clazz.newInstance();
             } catch (Exception e) {
                  throw new RuntimeException(e);

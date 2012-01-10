@@ -15,7 +15,7 @@ import java.util.*;
  */
 public class DefaultMessagesResource extends MessagesResource {
 
-    File targetDir;
+    protected File targetDir;
 
     public DefaultMessagesResource() {
         String applicationPath = Play.applicationPath.getPath();
