@@ -14,6 +14,11 @@ bc. *     /    module:messages
 
 Then you can access the tool at **http://localhost:9000/@messages**.
 
+h2. New in version 1.3
+
+- Configurable default language. If *messages.defaultLanguage* property is defined use messages.[property value] when reading/writing the default language.
+- Improved support for custom MessageResource
+
 h2. New in version 1.2
 
 - Support for play path given to the play command

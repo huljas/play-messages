@@ -15,7 +15,7 @@ import java.util.*;
  */
 public class DefaultMessagesResource extends MessagesResource {
 
-    File targetDir;
+    protected File targetDir;
     String defaultLanguage;
 
     public DefaultMessagesResource() {
