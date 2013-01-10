@@ -12,12 +12,13 @@ import java.util.regex.Pattern;
  */
 public class MessageKeyMatcher {
 
-    String REGEXP1 = "\\QMessages.get(\"\\E([^\"]*)\"";
-    String REGEXP2 = "\\QValidation\\E\\Q.addError(\\E[^,]*,[^\"]*[\"]([^\"]*)\"";
-    String REGEXP3 = "\\Q&{\\E[']([^']*)[']";
-    String REGEXP4 = "\\Qmessages\\E\\Q.get(\"\\E([^\"]*)\"";
-    String REGEXP5 = "\\Qmessages\\E\\Q.get(\'\\E([^\']*)\'";
-    String REGEXP6 = "\\Qi18n(\'\\E([^\']*)\'";
+    final String REGEXP1 = "\\QMessages.get(\"\\E([^\"]*)\"";
+    final String REGEXP2 = "\\QValidation\\E\\Q.addError(\\E[^,]*,[^\"]*[\"]([^\"]*)\"";
+    final String REGEXP3 = "\\Q&{\\E[']([^']*)[']";
+    final String REGEXP4 = "\\Qmessages\\E\\Q.get(\"\\E([^\"]*)\"";
+    final String REGEXP5 = "\\Qmessages\\E\\Q.get(\'\\E([^\']*)\'";
+    final String REGEXP6 = "\\Qi18n(\'\\E([^\']*)\'";
+    final String REGEXP7 = "\\Qmessages.getMessage(\\E[^,]*,[\\s]*'([^']*)'";
 
     private List<Pattern> patterns = new ArrayList<Pattern>();
 
@@ -27,7 +28,8 @@ public class MessageKeyMatcher {
         patterns.add(Pattern.compile(REGEXP3));
         patterns.add(Pattern.compile(REGEXP4));
         patterns.add(Pattern.compile(REGEXP5));                
-        patterns.add(Pattern.compile(REGEXP6));                
+        patterns.add(Pattern.compile(REGEXP6));
+        patterns.add(Pattern.compile(REGEXP7));
     }
 
     /**
