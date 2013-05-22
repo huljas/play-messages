@@ -1,16 +1,17 @@
-package play.modules.messages;
-
-import play.Play;
+package messageutils;
 
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * Class for saving and loading the messages data.
  * <p>
- * Default implementation uses files. To override this you should extend this class and configure the class
- * with the messages.resource property in the application.conf.
- *
+ * Default implementation uses files. To override this you should extend this
+ * class and configure the class with the messages.resource property in the
+ * application.conf.
+ * 
  * @author huljas
  */
 public abstract class MessagesResource {
@@ -22,16 +23,21 @@ public abstract class MessagesResource {
     public static synchronized MessagesResource instance() {
         if (instance == null) {
             try {
-                String resourceClass = Play.configuration.getProperty("messages.resource", DefaultMessagesResource.class.getName());
-                Class clazz = Class.forName(resourceClass, true, Play.classloader);
+                String resourceClass = MessagesUtil.getConfig(
+                        "messages.resource", null);
+
+                if (StringUtils.isBlank(resourceClass)) {
+                    resourceClass = DefaultMessagesResource.class.getName();
+                }
+                Class<?> clazz = Class.forName(resourceClass);
                 instance = (MessagesResource) clazz.newInstance();
             } catch (Exception e) {
-                 throw new RuntimeException(e);
+                throw new RuntimeException(e);
             }
         }
+
         return instance;
     }
-
 
     /**
      * Loads the keys in the keep list.
@@ -46,8 +52,7 @@ public abstract class MessagesResource {
     /**
      * Loads messages for given language.
      */
-    public abstract Map<String,String> loadMessages(String language);
-
+    public abstract Map<String, String> loadMessages(String language);
 
     /**
      * Saves new value for given key.

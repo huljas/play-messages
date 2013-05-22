@@ -1,32 +1,39 @@
 package controllers;
 
-import org.apache.commons.lang.StringUtils;
-import play.Play;
-import play.modules.messages.MessagesResource;
-import play.modules.messages.MessagesUtil;
-import play.modules.messages.SourceKeys;
-import play.mvc.Before;
-import play.mvc.Controller;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import static play.data.Form.form;
 
-import java.io.IOException;
-import java.util.*;
+import org.apache.commons.lang3.StringUtils;
+
+import play.data.Form;
+import play.i18n.Lang;
+import play.mvc.Controller;
+import play.mvc.Result;
+import views.html.helper.form;
+
+import messageutils.MessagesResource;
+import messageutils.MessagesUtil;
+import messageutils.SourceKeys;
+import models.Localization;
 
 /**
  * @author huljas
  */
 public class MessagesController extends Controller {
 
-    @Before
-    public static void disableInProduction() {
-        if (Play.mode == Play.Mode.PROD) {
-            error(404, "Page not found");
-        }
-    }
-
-    public static void index(String language, String defaultLanguage) {
+    public static Result index() {
+        String language = null;
+        String defaultLanguage = null;
         if (StringUtils.isBlank(defaultLanguage)) {
-            if (Play.langs.size() == 0) {
-                error(500, "ERROR: Required application.langs property is not set!");
+            if (Lang.availables().size() == 0) {
+                // return
+                // internalServerError("ERROR: Required application.langs property is not set!");
             }
             defaultLanguage = MessagesResource.DEFAULT_LANGUAGE;
         }
@@ -34,16 +41,19 @@ public class MessagesController extends Controller {
             language = MessagesResource.DEFAULT_LANGUAGE;
         }
         MessagesResource messagesResource = MessagesResource.instance();
-        Map<String,String> values = messagesResource.loadMessages(language);
-        Map<String,String> defaultValues = messagesResource.loadMessages(defaultLanguage);
+        Map<String, String> values = messagesResource.loadMessages(language);
+        Map<String, String> defaultValues = messagesResource
+                .loadMessages(defaultLanguage);
         List<String> keepList = messagesResource.loadKeepList();
         List<String> ignoreList = messagesResource.loadIgnoreList();
 
         SourceKeys sources = SourceKeys.lookUp();
 
         Collection<String> newKeys = MessagesUtil.getNewKeys(sources, values);
-        Collection<String> obsoleteKeys = MessagesUtil.getObsoleteKeys(sources, values);
-        Collection<String> existingKeys = MessagesUtil.getExistingKeys(sources, values);
+        Collection<String> obsoleteKeys = MessagesUtil.getObsoleteKeys(sources,
+                values);
+        Collection<String> existingKeys = MessagesUtil.getExistingKeys(sources,
+                values);
 
         for (String key : keepList) {
             if (obsoleteKeys.contains(key) || existingKeys.contains(key)) {
@@ -55,51 +65,33 @@ public class MessagesController extends Controller {
         obsoleteKeys.removeAll(keepList);
         newKeys.removeAll(ignoreList);
 
-        List<String> langs = new ArrayList<String>(Play.langs);
+        List<String> langs = new ArrayList<String>();
+        for (Lang i : Lang.availables()) {
+            langs.add(i.code());
+        }
         langs.add("default");
+        
+        List<Localization> model = new ArrayList<Localization>();
 
-        render(language, defaultLanguage, values, defaultValues, sources, newKeys, existingKeys, obsoleteKeys, keepList, ignoreList, langs);
+        return ok(views.html.MessagesController.index.render(model));
     }
 
-    public static void save(String language, String key, String value, boolean keep) {
-        if (!StringUtils.isBlank(value) && !StringUtils.isBlank(key)) {
+    public static Result save() {
+        final Form<Localization> model = form(Localization.class)
+                .bindFromRequest();
+        final Localization m = model.get();
+
+        if (!StringUtils.isBlank(m.key) && !StringUtils.isBlank(m.value)) {
             MessagesResource messagesResource = MessagesResource.instance();
-            messagesResource.save(language, key, value);
-            if (keep) {
-                messagesResource.keep(key);
-            } else {
-                messagesResource.removeKeep(key);
-            }
+            messagesResource.save(m.locale, m.key, m.value);
         }
-        render(value);
+
+        return ok(m.value);
     }
 
-    public static void applyChanges(String language, String defaultLanguage, MessagesAction action, List<String> keys) {
-        if (action == MessagesAction.REMOVE) {
-            MessagesResource messagesResource = MessagesResource.instance();
-            messagesResource.removeAll(language, keys);
-        } else if (action == MessagesAction.IGNORE) {
-            MessagesResource messagesResource = MessagesResource.instance();
-            messagesResource.ignoreAll(keys);
-        } else if (action == MessagesAction.UNIGNORE) {
-            MessagesResource messagesResource = MessagesResource.instance();
-            messagesResource.unignoreAll(keys);
-        }
-        index(language, defaultLanguage);
-    }
-
-    public static void addKey(String language, String defaultLanguage, String key) {
-        MessagesResource messagesResource = MessagesResource.instance();
-        Map<String,String> values = messagesResource.loadMessages(language);
-        Map<String,String> defaultValues = messagesResource.loadMessages(defaultLanguage);
-        List<String> keepList = new ArrayList<String>();
-        keepList.add(key);
-        render("_row.html", language, defaultLanguage, values, defaultValues, key, keepList);
-    }
-
-    public static void sources(String key) {
+    public static Result sources(String key) {
         SourceKeys sources = SourceKeys.lookUp();
-        render(key, sources);
+        return ok(views.html.MessagesController.sources.render());
     }
 
     private static List<String> removeDuplicates(List<String> list) {

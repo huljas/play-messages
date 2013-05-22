@@ -1,0 +1,175 @@
+@(localizations: List[Localization])
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Messages</title>
+    <script src="http://code.jquery.com/jquery-1.9.1.js" type="text/javascript"></script>
+    <script src="http://code.jquery.com/jquery-migrate-1.2.1.js" type="text/javascript"></script>
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js" type="text/javascript"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="http://www.appelsiini.net/download/jquery.jeditable.mini.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables_themeroller.css">
+</head>
+
+<body>
+
+<div>
+<a href="javascript:void(0)" onclick="fnShowHide(1)">Toggle 1</a>
+<a href="javascript:void(0)" onclick="fnShowHide(2)">Toggle 2</a>
+</div>
+
+<table id="table">
+<thead>
+<th>A</th>
+<th>B</th>
+<th>C</th>
+</thead>
+<tbody>
+<tr id='key_1'>
+    <td>1</td>
+    <td class="edit">2</td>
+    <td class="edit">3</td>
+</tr>
+<tr id='key_2'>
+    <td>4</td>
+    <td class="edit">5</td>
+    <td class="edit">6</td>
+</tr>
+<tr id='key_3'>
+    <td>1</td>
+    <td class="edit">2</td>
+    <td class="edit">3</td>
+</tr>
+</tbody>
+</table>
+
+<script type="text/javascript">
+
+function fnShowHide( iCol )
+{
+    var oTable = $('#table').dataTable();
+     
+    var bVis = oTable.fnSettings().aoColumns[iCol].bVisible;
+    oTable.fnSetColumnVis( iCol, bVis ? false : true );
+}
+
+$(document).ready(function() {
+    var oTable = $('#table').dataTable();
+    
+    oTable.$('td.edit').editable('@routes.MessagesController.save()', {
+        callback: function(sValue, y) {
+            
+        },
+        submitdata: function(value, settings) {
+            return {
+                row_id: this.parentNode.getAttribute('id'),
+                column: oTable.fnGetPosition(this)[2]
+            };
+        },
+        height: "100%",
+        width: "100%"
+    });
+});
+</script>
+
+<div id="sources">
+    <div id="sources-target"></div>
+</div>
+
+<script type="text/javascript">
+$(function(){
+    $("#ignore-toggle").click(function() {
+        $(this).find("b").toggleClass("ui-icon-triangle-1-e").toggleClass("ui-icon-triangle-1-s");
+        $("#ignored-target").toggle("fast");
+        return false;
+    });
+    $("select.language").bind('change', function() {
+        if ($(this).data("selected") != $(this).val()) {
+            window.location = $(this).find("option:selected").data("href");
+        }
+    });
+
+    $("#add-key").click(function() {
+        var key = prompt("Key", "enter new key");
+        key = $.trim(key);
+        if (key != null && key != "enter new key" && key != "") {
+            $.ajax({url:'',type:'POST',
+                data:{key:key,language:'${language}',defaultLanguage:'${defaultLanguage}'},
+                success : function(data) {
+                    $("#new-keys tbody").append(data);
+                    $("#new-keys tbody tr:last").addClass( $("#new-keys tbody tr").length % 2 == 0 ? "even" : "odd" );
+                    $("#new-keys tbody tr:last td.message").click();
+                    $("#new-keys tbody tr:last").find("textarea").focus();
+                }
+            });
+        }
+        return false;
+    });
+
+    $("tbody tr td:not(.action)").live('click', function() {
+        $("tbody tr.selected").removeClass("selected");
+        $(this).closest("tr").addClass("selected");
+    });
+    $(".actions .save").live('click', function() {
+        var tr = $(this).closest("tr");
+        tr.removeClass("selected");
+        tr.find("pre.messages-value").html('<p class="loading">Loading ...</p>');
+
+        var parent = $(this).closest(".value-edit");
+        var args = parent.find("input, textarea").serializeArray();
+        var url = "";
+        tr.find("pre.messages-value").load(url, args, function() {
+            tr.effect('pulsate', {times: 2}, 300);
+        });
+        return false;
+    });
+    $(".actions .cancel").live('click', function() {
+        var tr = $(this).closest("tr");
+        var value = tr.find("pre.messages-value").html();
+        tr.find(".value-edit textarea").val(value);
+        tr.removeClass("selected");
+        return false;
+    });
+
+    var updateCount = function(form) {
+        var count = form.find("input.key-check:checked").length;
+        if (count == 1) {
+            form.find(".title-option").html("Action for selected " + count + " item");
+        } else {
+            form.find(".title-option").html("Action for selected " + count + " items");
+        }
+    };
+
+    $(".check-all").click(function() {
+        if ($(this).is(":checked")) {
+            $(this).closest("table").find("input.key-check").attr("checked", "checked");
+        } else {
+            $(this).closest("table").find("input.key-check").removeAttr("checked");
+        }
+        updateCount($(this).closest("form"));
+    });
+
+    $("input.key-check").live('click', function() {
+        updateCount($(this).closest("form"));
+    });
+
+    $(".show-sources").click(function() {
+        var key = $(this).closest("td").find("input[name='key']").val();
+        $("#sources").dialog('open').dialog('option', {title:'Usage of key "'+key+'"', maxHeight: 600});
+        $("#sources-target").html('<p class="loading">Loading</p>').load('', {key:key});
+        return false;
+    });
+
+    $("#sources").dialog({autoOpen:false, modal:true, width: 800, height: 600});
+    $("#tabs").tabs({
+        cookie: {
+            // store cookie for a day, without, it would be a session cookie
+            //expires: 1
+        }
+    });
+    $("form").show();
+});
+</script>
+</body>
+</html>

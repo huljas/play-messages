@@ -1,4 +1,4 @@
-package play.modules.messages;
+package messageutils;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,35 +1,58 @@
-package play.modules.messages;
+package messageutils;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import play.Play;
-import play.libs.IO;
+import org.apache.commons.lang3.StringUtils;
 
-import java.io.*;
-import java.util.*;
+import play.Play;
 
 /**
  * Default messages resource uses the Play messages files.
- *
+ * 
  * @author huljas
  */
 public class DefaultMessagesResource extends MessagesResource {
 
     protected File targetDir;
-    String defaultLanguage;
+    private String defaultLanguage;
 
     public DefaultMessagesResource() {
-        String applicationPath = Play.applicationPath.getPath();
+        String applicationPath = Play.application().path().toString();
         String separator = System.getProperty("file.separator");
-        targetDir = new File(applicationPath + separator + Play.configuration.getProperty("messages.targetDir", "conf"));
-        defaultLanguage = Play.configuration.getProperty("messages.defaultLanguage", "");
+        targetDir = new File(applicationPath + separator
+                + MessagesUtil.getConfig("messages.targetDir", "conf"));
+        defaultLanguage = MessagesUtil
+                .getConfig("messages.defaultLanguage", "");
     }
 
     @Override
     public List<String> loadKeepList() {
         try {
             File file = new File(targetDir, "messages.keep");
-            BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
+            BufferedInputStream in = new BufferedInputStream(
+                    new FileInputStream(file));
             List<String> result = IOUtils.readLines(in, "UTF-8");
             IOUtils.closeQuietly(in);
             return result;
@@ -44,7 +67,8 @@ public class DefaultMessagesResource extends MessagesResource {
     public List<String> loadIgnoreList() {
         try {
             File file = new File(targetDir, "messages.ignore");
-            BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
+            BufferedInputStream in = new BufferedInputStream(
+                    new FileInputStream(file));
             List<String> result = IOUtils.readLines(in, "UTF-8");
             IOUtils.closeQuietly(in);
             return result;
@@ -57,22 +81,37 @@ public class DefaultMessagesResource extends MessagesResource {
 
     @Override
     public Map<String, String> loadMessages(String language) {
+        BufferedReader in = null;
         try {
             File file = getMessagesFile(language);
-            BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
-            Properties properties = IO.readUtf8Properties(in);
-            IOUtils.closeQuietly(in);
-            return new HashMap(properties);
+            in = new BufferedReader(new InputStreamReader(new FileInputStream(
+                    file), "UTF-8"));
+            Properties properties = new Properties();
+            properties.load(in);
+            in.close();
+            HashMap<String, String> map = new HashMap<String, String>();
+            for (Entry<Object, Object> i : properties.entrySet()) {
+                map.put(i.getKey().toString(), i.getValue().toString());
+            }
+
+            return map;
         } catch (FileNotFoundException e) {
-            return new HashMap<String,String>();
+            return new HashMap<String, String>();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                }
+            }
         }
     }
 
     @Override
     public void save(String language, String key, String value) {
-        Map<String,String> messages = loadMessages(language);
+        Map<String, String> messages = loadMessages(language);
         messages.put(key, value);
         saveMessages(language, messages);
     }
@@ -121,7 +160,8 @@ public class DefaultMessagesResource extends MessagesResource {
         File file = new File(targetDir, "messages.keep");
         try {
             Collections.sort(list);
-            BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file));
+            BufferedOutputStream out = new BufferedOutputStream(
+                    new FileOutputStream(file));
             IOUtils.writeLines(list, null, out, "UTF-8");
             IOUtils.closeQuietly(out);
         } catch (IOException e) {
@@ -133,7 +173,8 @@ public class DefaultMessagesResource extends MessagesResource {
         File file = new File(targetDir, "messages.ignore");
         try {
             Collections.sort(list);
-            BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file));
+            BufferedOutputStream out = new BufferedOutputStream(
+                    new FileOutputStream(file));
             IOUtils.writeLines(list, null, out, "UTF-8");
             IOUtils.closeQuietly(out);
         } catch (IOException e) {
@@ -146,13 +187,15 @@ public class DefaultMessagesResource extends MessagesResource {
             File file = getMessagesFile(language);
             Properties properties = new Properties();
             properties.putAll(messages);
-            // This is ugly but the properties string formatting is so weird that I don't want to
+            // This is ugly but the properties string formatting is so weird
+            // that I don't want to
             // start messing around with it.
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             Writer stringWriter = new OutputStreamWriter(baos, "UTF-8");
             properties.store(stringWriter, "");
             IOUtils.closeQuietly(stringWriter);
-            InputStreamReader lineReader = new InputStreamReader(new ByteArrayInputStream(baos.toByteArray()), "UTF-8");
+            InputStreamReader lineReader = new InputStreamReader(
+                    new ByteArrayInputStream(baos.toByteArray()), "UTF-8");
             String propertiesAsString = IOUtils.toString(lineReader);
             String[] lines = StringUtils.split(propertiesAsString, "\n");
             List<String> list = new ArrayList<String>();
@@ -165,9 +208,11 @@ public class DefaultMessagesResource extends MessagesResource {
                 }
             }
             Collections.sort(list);
-            BufferedWriter fileWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
+            BufferedWriter fileWriter = new BufferedWriter(
+                    new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
             String content = StringUtils.join(list, "\n");
-            content = new StringBuilder("# Saved by @messages on ").append(new Date()).append("\n").append(content).toString();
+            content = new StringBuilder("# Saved by @messages on ")
+                    .append(new Date()).append("\n").append(content).toString();
             IOUtils.write(content, fileWriter);
             IOUtils.closeQuietly(fileWriter);
         } catch (IOException e) {
@@ -177,7 +222,8 @@ public class DefaultMessagesResource extends MessagesResource {
 
     private File getMessagesFile(String language) {
         if (language.equals(DEFAULT_LANGUAGE)) {
-            return new File(targetDir, defaultLanguage.isEmpty() ? "messages" : "messages." + defaultLanguage);
+            return new File(targetDir, defaultLanguage.isEmpty() ? "messages"
+                    : "messages." + defaultLanguage);
         } else {
             return new File(targetDir, "messages." + language);
         }

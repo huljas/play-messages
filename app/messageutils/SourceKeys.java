@@ -1,16 +1,24 @@
-package play.modules.messages;
+package messageutils;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import play.Play;
-import play.utils.HTML;
+import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+
+import play.Play;
 
 /**
  * Class for finding localization keys in the application sources.
@@ -22,10 +30,10 @@ public class SourceKeys {
     public static SourceKeys lookUp() {
         SourceKeys foundKeys = new SourceKeys();
         MessageKeyMatcher matcher = new MessageKeyMatcher();
-        String s = Play.configuration.getProperty("messages.srcDir", "app");
+        String s = MessagesUtil.getConfig("messages.srcDir", "app");
 
         String[] paths = s.split(Pattern.quote(","));
-        String applicationPath = Play.applicationPath.getPath();
+        String applicationPath = Play.application().path().toString();
         String separator = System.getProperty("file.separator");
 
         for (String path : paths) {
@@ -57,7 +65,7 @@ public class SourceKeys {
         StringBuilder snippet = new StringBuilder();
         for (int i = start; i <= end; i++) {
             String s = lines.get(i);
-            s = HTML.htmlEscape(s);
+            s = escapeHtml4(s);
             if (i == line) {
                 s = s.replace(key, "</pre><pre class=\"k\">" + key + "</pre><pre class=\"co\">");
             }

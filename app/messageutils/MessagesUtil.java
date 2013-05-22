@@ -1,6 +1,9 @@
-package play.modules.messages;
+package messageutils;
 
 import java.util.*;
+
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 
 /**
  * Helper class for messages.
@@ -8,6 +11,16 @@ import java.util.*;
  * @author huljas
  */
 public class MessagesUtil {
+
+    @SuppressWarnings("unchecked")
+    public static <T> T getConfig(String key, T defaultValue) {
+        try {
+            Config config = ConfigFactory.load();
+            return (T) config.getAnyRef(key);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
 
     public static Collection<String> getNewKeys(SourceKeys sources, Map<String,String> messages) {
         Set<String> set = new HashSet<String>();

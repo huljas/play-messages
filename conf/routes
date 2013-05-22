@@ -5,8 +5,6 @@
 #
 # ~~~~
 
-GET     /@messages              MessagesController.index
-POST    /@messages/update       MessagesController.save
-POST    /@messages/apply        MessagesController.applyChanges
-POST    /@messages/add          MessagesController.addKey
-POST    /@messages/sources      MessagesController.sources
+GET    /@messages                controllers.MessagesController.index()
+POST   /@messages/update         controllers.MessagesController.save()
+POST   /@messages/sources/:key   controllers.MessagesController.sources(key: String)
