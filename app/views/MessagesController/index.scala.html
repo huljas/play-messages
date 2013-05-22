@@ -1,4 +1,9 @@
 @(localizations: List[Localization])
+
+@{
+    val byKey = localizations.groupBy(_.key)
+}
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,43 +20,47 @@
 <body>
 
 <div>
-<a href="javascript:void(0)" onclick="fnShowHide(1)">Toggle 1</a>
-<a href="javascript:void(0)" onclick="fnShowHide(2)">Toggle 2</a>
+@for((key, value) <- localizations.groupBy(_.locale)){
+    <a href="javascript:void(0)" onclick="fnShowHide('@key')">Toggle @key</a>
+}
 </div>
 
 <table id="table">
 <thead>
-<th>A</th>
-<th>B</th>
-<th>C</th>
+<th>Key</th>
+@for((key, value) <- localizations.groupBy(_.locale)){
+    <th name="@key">@key</th>
+}
 </thead>
 <tbody>
-<tr id='key_1'>
-    <td>1</td>
-    <td class="edit">2</td>
-    <td class="edit">3</td>
-</tr>
-<tr id='key_2'>
-    <td>4</td>
-    <td class="edit">5</td>
-    <td class="edit">6</td>
-</tr>
-<tr id='key_3'>
-    <td>1</td>
-    <td class="edit">2</td>
-    <td class="edit">3</td>
-</tr>
+@for((key, value) <- localizations.groupBy(_.key)){
+    <tr name="@key">    
+        <td>@key</td>   
+    @for((lkey, lvalue) <- localizations.groupBy(_.locale)){
+        <td class="edit">@value.groupBy(_.locale)(lkey)(0).value</td>
+    }
+    </tr>
+}
 </tbody>
 </table>
 
 <script type="text/javascript">
 
-function fnShowHide( iCol )
+function fnShowHide( iColName )
 {
+    if (!window.colmapping) {
+        window.colmapping = new Array();
+    }
+    var iCol = window.colmapping[iColName];
+    if (!iCol) {
+        var col = $('#table th[name=' + iColName + ']');
+        iCol = window.colmapping[iColName] = $('#table th').index(col);
+    }
+    
     var oTable = $('#table').dataTable();
      
     var bVis = oTable.fnSettings().aoColumns[iCol].bVisible;
-    oTable.fnSetColumnVis( iCol, bVis ? false : true );
+    oTable.fnSetColumnVis( iCol, !bVis );
 }
 
 $(document).ready(function() {
@@ -62,9 +71,12 @@ $(document).ready(function() {
             
         },
         submitdata: function(value, settings) {
+            var index = oTable.fnGetPosition(this)[2];
+            var col = $("#table th:nth-child(" + (index + 1) + ")");
+            
             return {
-                row_id: this.parentNode.getAttribute('id'),
-                column: oTable.fnGetPosition(this)[2]
+                key: this.parentNode.getAttribute('name'),
+                locale: col.attr("name")
             };
         },
         height: "100%",
