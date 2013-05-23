@@ -1,5 +1,13 @@
-@()
-    <div class="source">
-        <strong></strong>
-        <div class="code"></div>
-    </div>
+@(model: messageutils.SourceKeys, key: String)
+@if(model.getKeySourceList(key).listSourceFiles().size() > 0) {
+    @for(source <- model.getKeySourceList(key).listSourceFiles()) {
+        <div class="source">
+            <strong>@source.path</strong>
+            @for(snippet <- source.listSnippets()) {
+                <div class="code">@Html(snippet.snippet)</div>
+            }
+        </div>        
+    }
+} else {
+    @Messages("sources.keynotfound", key)
+}

@@ -1,74 +1,122 @@
-@(localizations: List[Localization])
-
-@{
-    val byKey = localizations.groupBy(_.key)
-}
+@(model: IndexModel)
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Messages</title>
+    <title>@Messages("datatable.title")</title>
     <script src="http://code.jquery.com/jquery-1.9.1.js" type="text/javascript"></script>
     <script src="http://code.jquery.com/jquery-migrate-1.2.1.js" type="text/javascript"></script>
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js" type="text/javascript"></script>
     <script src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js" type="text/javascript"></script>
-    <script src="http://www.appelsiini.net/download/jquery.jeditable.mini.js" type="text/javascript"></script>
+    <script src="@routes.Assets.at("javascripts/FixedHeader.min.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.at("javascripts/ColVis.min.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.at("javascripts/jquery.jeditable.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.at("javascripts/notify.js")" type="text/javascript"></script>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
-    <link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables_themeroller.css">
+    <link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
+    <link rel="stylesheet" href="@routes.Assets.at("stylesheets/ColVis.css")">
+    <link rel="stylesheet" href="@routes.Assets.at("stylesheets/main.css")">
+    <link rel="stylesheet" href="@routes.Assets.at("stylesheets/notify.css")">
 </head>
 
 <body>
 
-<div>
-@for((key, value) <- localizations.groupBy(_.locale)){
-    <a href="javascript:void(0)" onclick="fnShowHide('@key')">Toggle @key</a>
-}
+<div class="notification-area"></div>
+
+<div class="legend">
+<span>@Messages("datatable.legend")</span>
+<div class="normal">@Messages("datatable.normal")</div>@*
+*@<div class="new">@Messages("datatable.new")</div>@*
+*@<div class="obsolete">@Messages("datatable.obsolete")</div>@*
+*@<div class="missing">@Messages("datatable.missing")</div>
 </div>
 
+<div class="main">
 <table id="table">
 <thead>
-<th>Key</th>
-@for((key, value) <- localizations.groupBy(_.locale)){
+<th>@Messages("datatable.key")</th>
+@for(key <- model.langs){
     <th name="@key">@key</th>
 }
 </thead>
 <tbody>
-@for((key, value) <- localizations.groupBy(_.key)){
-    <tr name="@key">    
-        <td>@key</td>   
-    @for((lkey, lvalue) <- localizations.groupBy(_.locale)){
-        <td class="edit">@value.groupBy(_.locale)(lkey)(0).value</td>
+@for((key, value) <- model.list.groupBy(_.key)){
+    <tr name="@key" class="@if(model.newKeys.contains(key)) { new } else { @if(model.obsoleteKeys.contains(key)) { obsolete }}">
+        <td>
+            @if(model.obsoleteKeys.contains(key)) {
+            <a href="javascript:void(0)" onclick="fnDeleteKey('@key')"><img src="@routes.Assets.at("images/delete.png")" alt="delete" /></a>
+            } else {
+            <a href="#" class="show-sources"><img src="@routes.Assets.at("images/code.png")" alt="code" /></a>   
+            }
+            <span class="key">@key</span>
+        </td>
+    @defining(value.groupBy(_.locale)) { curLocales => 
+    @for(lkey <- model.langs){
+        @if(curLocales.contains(lkey)){
+            <td class="edit">@curLocales(lkey)(0).value</td>
+        }else{
+            <td class="edit @if(model.newKeys.contains(key)) { new } else { @if(model.obsoleteKeys.contains(key)) { obsolete } else { missing }}"></td>
+        }
+    }
     }
     </tr>
 }
 </tbody>
 </table>
-
+</div>
 <script type="text/javascript">
 
-function fnShowHide( iColName )
-{
-    if (!window.colmapping) {
-        window.colmapping = new Array();
-    }
-    var iCol = window.colmapping[iColName];
-    if (!iCol) {
-        var col = $('#table th[name=' + iColName + ']');
-        iCol = window.colmapping[iColName] = $('#table th').index(col);
-    }
-    
-    var oTable = $('#table').dataTable();
-     
-    var bVis = oTable.fnSettings().aoColumns[iCol].bVisible;
-    oTable.fnSetColumnVis( iCol, !bVis );
+function fnDeleteKey(key) {
+    $.ajax('@routes.MessagesController.delete()', {
+        type: "POST",
+        data: {
+            key: key
+        }
+    }).done(function(msg) {
+        $("div.notification-area").html(msg);
+        var failed = $("div.notification-area div.value").text();
+        debugger;
+        if (!failed) {
+            var oTable = $('#table').dataTable();
+            oTable.fnDeleteRow( $('#table tr[name="'+key+'"]').get(0) );
+        }
+    });
 }
 
 $(document).ready(function() {
-    var oTable = $('#table').dataTable();
+    var oTable = $('#table').dataTable({
+        bAutoWidth: false,
+        iDisplayLength: 50,
+        sDom: 'C<"clear">lfrtip',
+        oColVis: {
+            "activate": "mouseover",
+            "aiExclude": [0]
+        }
+    });
+    new FixedHeader(oTable, {
+        //left: true
+    });    
     
     oTable.$('td.edit').editable('@routes.MessagesController.save()', {
-        callback: function(sValue, y) {
+        //type: "textarea",
+        //cancel: "Cancel",
+        //submit: "Save",
+        callback: function(value, settings) {
+            var td = $(this).closest("td");
+            if ($(this).text()) {
+                if(td.hasClass("new")) {
+                    td.removeClass("new");
+                    $(this).closest("tr").removeClass("new");
+                    $(this).siblings("td.edit").removeClass("new").addClass("missing");
+                }
+                
+                td.removeClass("missing");
+            } else {
+                td.addClass("missing");
+            }
             
+            $("div.notification-area").html(value);
+            $(this).text($("div.notification-area div.value").text());
         },
         submitdata: function(value, settings) {
             var index = oTable.fnGetPosition(this)[2];
@@ -91,96 +139,30 @@ $(document).ready(function() {
 
 <script type="text/javascript">
 $(function(){
-    $("#ignore-toggle").click(function() {
-        $(this).find("b").toggleClass("ui-icon-triangle-1-e").toggleClass("ui-icon-triangle-1-s");
-        $("#ignored-target").toggle("fast");
-        return false;
-    });
-    $("select.language").bind('change', function() {
-        if ($(this).data("selected") != $(this).val()) {
-            window.location = $(this).find("option:selected").data("href");
-        }
-    });
-
-    $("#add-key").click(function() {
-        var key = prompt("Key", "enter new key");
-        key = $.trim(key);
-        if (key != null && key != "enter new key" && key != "") {
-            $.ajax({url:'',type:'POST',
-                data:{key:key,language:'${language}',defaultLanguage:'${defaultLanguage}'},
-                success : function(data) {
-                    $("#new-keys tbody").append(data);
-                    $("#new-keys tbody tr:last").addClass( $("#new-keys tbody tr").length % 2 == 0 ? "even" : "odd" );
-                    $("#new-keys tbody tr:last td.message").click();
-                    $("#new-keys tbody tr:last").find("textarea").focus();
-                }
-            });
-        }
-        return false;
-    });
-
-    $("tbody tr td:not(.action)").live('click', function() {
-        $("tbody tr.selected").removeClass("selected");
-        $(this).closest("tr").addClass("selected");
-    });
-    $(".actions .save").live('click', function() {
-        var tr = $(this).closest("tr");
-        tr.removeClass("selected");
-        tr.find("pre.messages-value").html('<p class="loading">Loading ...</p>');
-
-        var parent = $(this).closest(".value-edit");
-        var args = parent.find("input, textarea").serializeArray();
-        var url = "";
-        tr.find("pre.messages-value").load(url, args, function() {
-            tr.effect('pulsate', {times: 2}, 300);
-        });
-        return false;
-    });
-    $(".actions .cancel").live('click', function() {
-        var tr = $(this).closest("tr");
-        var value = tr.find("pre.messages-value").html();
-        tr.find(".value-edit textarea").val(value);
-        tr.removeClass("selected");
-        return false;
-    });
-
-    var updateCount = function(form) {
-        var count = form.find("input.key-check:checked").length;
-        if (count == 1) {
-            form.find(".title-option").html("Action for selected " + count + " item");
-        } else {
-            form.find(".title-option").html("Action for selected " + count + " items");
-        }
-    };
-
-    $(".check-all").click(function() {
-        if ($(this).is(":checked")) {
-            $(this).closest("table").find("input.key-check").attr("checked", "checked");
-        } else {
-            $(this).closest("table").find("input.key-check").removeAttr("checked");
-        }
-        updateCount($(this).closest("form"));
-    });
-
-    $("input.key-check").live('click', function() {
-        updateCount($(this).closest("form"));
-    });
-
     $(".show-sources").click(function() {
-        var key = $(this).closest("td").find("input[name='key']").val();
-        $("#sources").dialog('open').dialog('option', {title:'Usage of key "'+key+'"', maxHeight: 600});
-        $("#sources-target").html('<p class="loading">Loading</p>').load('', {key:key});
+        var key = $(this).closest("tr").attr("name");
+        $("#sources").dialog('open').dialog('option', {
+            title:'@Messages("sources.header") "'+key+'"',
+            maxHeight: 600
+        });
+        $("#sources-target")
+            .html('<div class="loading"></div>')
+            .load('@routes.MessagesController.sources', {
+                key:key
+            });
         return false;
     });
 
-    $("#sources").dialog({autoOpen:false, modal:true, width: 800, height: 600});
-    $("#tabs").tabs({
-        cookie: {
-            // store cookie for a day, without, it would be a session cookie
-            //expires: 1
-        }
+    $("#sources").dialog({
+        autoOpen: false, 
+        modal: true, 
+        width: 800,
+        height: 600
     });
-    $("form").show();
+    $('.ui-widget-overlay').live('click', function() {
+         $('#sources').dialog( "close" );
+    });
+
 });
 </script>
 </body>

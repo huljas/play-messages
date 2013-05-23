@@ -1,1 +1,14 @@
-<pre>${value}</pre>
+@(model: SaveModel)
+<div class="value">@model.value</div>
+@if(model.notification != null) {
+    <script type="text/javascript">
+    <!--
+        $(function() {
+            $.notify.@(model.notification.notificationType)("@model.notification.message", {
+                autoClose: 3000,
+                close: true
+            });
+        });
+    -->
+    </script>
+}

@@ -38,6 +38,9 @@ public class DefaultMessagesResource extends MessagesResource {
     protected File targetDir;
     private String defaultLanguage;
 
+    /**
+     * Creates a new instance of the {@link DefaultMessagesResource}.
+     */
     public DefaultMessagesResource() {
         String applicationPath = Play.application().path().toString();
         String separator = System.getProperty("file.separator");

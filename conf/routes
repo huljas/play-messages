@@ -5,6 +5,8 @@
 #
 # ~~~~
 
-GET    /@messages                controllers.MessagesController.index()
-POST   /@messages/update         controllers.MessagesController.save()
-POST   /@messages/sources/:key   controllers.MessagesController.sources(key: String)
+GET    /               controllers.MessagesController.index()
+POST   /update         controllers.MessagesController.save()
+POST   /delete         controllers.MessagesController.delete()
+POST   /sources        controllers.MessagesController.sources()
+GET    /assets/*file   controllers.Assets.at(path="/public", file)

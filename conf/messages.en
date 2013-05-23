@@ -1,0 +1,16 @@
+# Saved by @messages on Fri May 24 01:19:44 CEST 2013
+datatable.key=Key
+datatable.legend=Legend
+datatable.missing=Missing
+datatable.new=New
+datatable.normal=Normal
+datatable.obsolete=Obsolete
+datatable.title=Messages
+delete.error=Failed to delete\: "{0}"
+delete.novalue=No values were submitted. Not deleting\: "{0}"
+delete.success=Successfully deleted\: "{0}"
+save.error=Failed to save\: "{0}"
+save.novalue=No values were submitted. Not saving\: "{0}"
+save.success=Successfully saved\: "{0}"
+sources.header=Usage of key
+sources.keynotfound=The Key "{0}" was not found in sources.

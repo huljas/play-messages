@@ -1,0 +1,16 @@
+# Saved by @messages on Fri May 24 01:22:43 CEST 2013
+datatable.key=Schlüssel
+datatable.legend=Legende
+datatable.missing=Fehlt
+datatable.new=Neu
+datatable.normal=Normal
+datatable.obsolete=Nicht verwendet
+datatable.title=Messages
+delete.error=Fehler beim Löschen\: "{0}"
+delete.novalue=Keine Werte übermittelt. Es wird nicht gelöscht\: "{0}"
+delete.success=Erfolgreich gelöscht\: "{0}"
+save.error=Fehler beim Speichern\: "{0}"
+save.novalue=Keine Werte übermittelt. Es wird nicht gespeichert\: "{0}"
+save.success=Erfolgreich gespeichert\: "{0}"
+sources.header=Verwendung des Schlüssels
+sources.keynotfound=Der Schlüssel "{0}" wurde nicht im Quellcode gefunden.
