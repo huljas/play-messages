@@ -32,9 +32,15 @@ public class MessagesController extends Controller {
 
     private static List<String> getLangs() {
         ArrayList<String> langs = new ArrayList<String>();
-        langs.add(MessagesResource.DEFAULT_LANGUAGE);
         for (Lang i : Lang.availables()) {
             langs.add(i.code());
+        }
+
+        String defaultLang = MessagesUtil.getConfig("messages.defaultLanguage",
+                "");
+
+        if (StringUtils.isBlank(defaultLang) || !langs.contains(defaultLang)) {
+            langs.add(0, MessagesResource.DEFAULT_LANGUAGE);
         }
 
         return langs;

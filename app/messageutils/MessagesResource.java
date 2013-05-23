@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
+import play.Play;
+
 /**
  * Class for saving and loading the messages data.
  * <p>
@@ -20,7 +22,7 @@ public abstract class MessagesResource {
      * The default language without a language code. Localizations with this
      * language will be saved to the file "messages".
      */
-    public static String DEFAULT_LANGUAGE = "default";
+    public final static String DEFAULT_LANGUAGE = "default";
 
     private static MessagesResource instance;
 
@@ -38,7 +40,9 @@ public abstract class MessagesResource {
                 if (StringUtils.isBlank(resourceClass)) {
                     resourceClass = DefaultMessagesResource.class.getName();
                 }
-                Class<?> clazz = Class.forName(resourceClass);
+
+                Class<?> clazz = Class.forName(resourceClass, true, Play
+                        .application().classloader());
                 instance = (MessagesResource) clazz.newInstance();
             } catch (Exception e) {
                 throw new RuntimeException(e);
