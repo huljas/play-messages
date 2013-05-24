@@ -187,36 +187,21 @@ public class DefaultMessagesResource extends MessagesResource {
 
     protected void saveMessages(String language, Map<String, String> messages) {
         try {
+            String lineEnding = System.getProperty("line.separator");
             File file = getMessagesFile(language);
-            Properties properties = new Properties();
-            properties.putAll(messages);
-            // This is ugly but the properties string formatting is so weird
-            // that I don't want to
-            // start messing around with it.
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            Writer stringWriter = new OutputStreamWriter(baos, "UTF-8");
-            properties.store(stringWriter, "");
-            IOUtils.closeQuietly(stringWriter);
-            InputStreamReader lineReader = new InputStreamReader(
-                    new ByteArrayInputStream(baos.toByteArray()), "UTF-8");
-            String propertiesAsString = IOUtils.toString(lineReader);
-            String[] lines = StringUtils.split(propertiesAsString, "\n");
-            List<String> list = new ArrayList<String>();
-            for (String line : lines) {
-                if (line.trim().length() > 0) {
-                    if (line.startsWith("#")) {
-                        continue;
-                    }
-                    list.add(line);
-                }
-            }
-            Collections.sort(list);
+            Collection<String> lines = new ArrayList<>();
+            lines.add("# Saved by play-messages");
+            lines.add(String.format("# %s", new Date()));
             BufferedWriter fileWriter = new BufferedWriter(
                     new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
-            String content = StringUtils.join(list, "\n");
-            content = new StringBuilder("# Saved by @messages on ")
-                    .append(new Date()).append("\n").append(content).toString();
-            IOUtils.write(content, fileWriter);
+
+            Object[] keys = messages.keySet().toArray();
+            Arrays.sort(keys);
+            for (Object key : keys) {
+                lines.add(String.format("%s = %s", key, messages.get(key)));
+            }
+
+            IOUtils.writeLines(lines, lineEnding, fileWriter);
             IOUtils.closeQuietly(fileWriter);
         } catch (IOException e) {
             throw new RuntimeException(e);
