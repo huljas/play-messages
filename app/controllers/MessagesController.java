@@ -73,6 +73,7 @@ public class MessagesController extends Controller {
         IndexModel model = new IndexModel();
         model.list = new ArrayList<Localization>();
         model.langs = langs;
+        model.defaultLang = DefaultMessagesResource.getDefaultLanguage();
         model.sources = sources;
         model.keepList = keepList;
         model.ignoreList = ignoreList;

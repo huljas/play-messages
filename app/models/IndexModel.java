@@ -8,6 +8,7 @@ public class IndexModel {
 
     public List<Localization> list;
     public List<String> langs;
+    public String defaultLang;
     public SourceKeys sources;
     public List<String> keepList;
     public List<String> ignoreList;

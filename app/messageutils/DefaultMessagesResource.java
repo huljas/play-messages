@@ -15,6 +15,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,6 +41,16 @@ public class DefaultMessagesResource extends MessagesResource {
     private String defaultLanguage;
 
     /**
+     * Gets the default language configured by the application or an empty
+     * string if undefined.
+     * 
+     * @return The default language.
+     */
+    public static String getDefaultLanguage() {
+        return MessagesUtil.getConfig("messages.defaultLanguage", "");
+    }
+
+    /**
      * Creates a new instance of the {@link DefaultMessagesResource}.
      */
     public DefaultMessagesResource() {
@@ -46,8 +58,7 @@ public class DefaultMessagesResource extends MessagesResource {
         String separator = System.getProperty("file.separator");
         targetDir = new File(applicationPath + separator
                 + MessagesUtil.getConfig("messages.targetDir", "conf"));
-        defaultLanguage = MessagesUtil
-                .getConfig("messages.defaultLanguage", "");
+        defaultLanguage = getDefaultLanguage();
     }
 
     @Override
