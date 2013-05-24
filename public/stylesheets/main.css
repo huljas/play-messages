@@ -19,6 +19,7 @@ table.dataTable tr:not(.obsolete) .btn-delete { display: none; }
 table.dataTable tr:not(.obsolete) .btn-keep { display: none; }
 table.dataTable tr:not(.keep) .btn-unkeep { display: none; }
 
+table.dataTable tr td:first-child { white-space: nowrap; }
 table.dataTable img { height: 1em; }
 
 table.dataTable { border-collapse:collapse; border-spacing:0; }
@@ -112,3 +113,4 @@ table.dataTable tr.even.obsolete td.sorting_2 { background-color: #ffffe2; }
 
 div.loading { background-image: url(../images/ajax-loader.gif); margin: 100px auto; width: 32px; height: 32px; }
 
+div.loading-small { width: 16px; height: 16px; background-repeat: no-repeat; background-image: url(../images/ajax-loader-small.gif); }

@@ -22,7 +22,7 @@ function makejEditable(obj) {
         //cancel: "Cancel",
         //submit: "Save",
         //onblur: "ignore",
-        indicator: "@Messages("index.saving")",
+        indicator: "<div class='loading-small'></div>",
         intercept: function(result) {
             result = jQuery.parseJSON(result);
             handleResult(result);
