@@ -1,0 +1,19 @@
+@(model: IndexModel, notification: Notification)
+<div class="unignored-rows">
+    <table>
+    @if(model != null) {
+        @for((key, value) <- model.list.groupBy(_.key)){
+            @_row(key, value, model)
+        }
+    } 
+    </table>
+</div>
+@if(notification != null) {
+    <script type="text/javascript">
+    <!--
+        $(function() {
+            notify("@notification.message", "@(notification.notificationType)");
+        });
+    -->
+    </script>
+}

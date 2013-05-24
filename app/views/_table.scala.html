@@ -1,0 +1,74 @@
+@(model: IndexModel)
+
+<table id="table">
+<thead>
+<th>@Messages("datatable.key")</th>
+@for(key <- model.langs){
+    <th name="@key">@key @if(model.defaultLang == key) { (@Messages("index.defaultlang")) }</th>
+}
+</thead>
+<tbody>
+@for((key, value) <- model.list.groupBy(_.key)){
+    @_row(key, value, model)
+}
+</tbody>
+</table>
+</div>
+<script type="text/javascript">
+
+function makejEditable(obj) {
+    obj.editable('@routes.MessagesController.save()', {
+        //type: "textarea",
+        //cancel: "Cancel",
+        //submit: "Save",
+        //onblur: "ignore",
+        indicator: "@Messages("index.saving")",
+        intercept: function(result) {
+            result = jQuery.parseJSON(result);
+            handleResult(result);
+            return result.value;
+        },
+        callback: function(value, settings) {
+            var td = $(this).closest("td");
+            if ($(this).text()) {
+                if(td.hasClass("new")) {
+                    td.removeClass("new");
+                    $(this).closest("tr").removeClass("new");
+                    $(this).siblings("td.edit").removeClass("new").addClass("missing");
+                }
+                
+                td.removeClass("missing");
+            } else {
+                td.addClass("missing");
+            }
+        },
+        submitdata: function(value, settings) {
+            var index = oTable.fnGetPosition(this)[2];
+            var col = $("#table th:nth-child(" + (index + 1) + ")");
+            
+            return {
+                key: this.parentNode.getAttribute('name'),
+                locale: col.attr("name")
+            };
+        },
+        height: "100%",
+        width: "100%"
+    });
+}
+
+$(document).ready(function() {
+    var oTable = $('#table').dataTable({
+        bAutoWidth: false,
+        iDisplayLength: 50,
+        sDom: 'C<"clear">lfrtip',
+        oColVis: {
+            "activate": "mouseover",
+            "aiExclude": [0]
+        }
+    });
+    new FixedHeader(oTable, {
+        //left: true
+    });
+    makejEditable(oTable.$('td.edit'));
+});
+</script>

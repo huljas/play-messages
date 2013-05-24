@@ -5,23 +5,27 @@ import static play.data.Form.form;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import messageutils.DefaultMessagesResource;
 import messageutils.MessagesResource;
 import messageutils.MessagesUtil;
 import messageutils.SourceKeys;
 import models.IndexModel;
 import models.Localization;
-import models.SaveModel;
-import models.SaveModel.Notification;
+import models.Notification;
+import models.ValueModel;
+import models.SuccessModel;
 
 import org.apache.commons.lang3.StringUtils;
 
 import play.data.Form;
 import play.i18n.Lang;
 import play.i18n.Messages;
+import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 
@@ -52,6 +56,12 @@ public class MessagesController extends Controller {
      * @return The index view.
      */
     public static Result index() {
+        IndexModel model = getIndexModel();
+
+        return ok(views.html.MessagesController.index.render(model));
+    }
+
+    private static IndexModel getIndexModel() {
         MessagesResource messagesResource = MessagesResource.instance();
         List<String> keepList = messagesResource.loadKeepList();
         List<String> ignoreList = messagesResource.loadIgnoreList();
@@ -91,24 +101,30 @@ public class MessagesController extends Controller {
             model.obsoleteKeys.addAll(obsoleteKeys);
             model.newKeys.addAll(newKeys);
             for (Entry<String, String> j : values.entrySet()) {
-                Localization loc = new Localization(j.getKey(), j.getValue(), i);
-                model.list.add(loc);
+                if (!ignoreList.contains(j.getKey())) {
+                    Localization loc = new Localization(j.getKey(),
+                            j.getValue(), i);
+                    model.list.add(loc);
+                }
             }
         }
 
+        model.newKeys = new ArrayList<>(new HashSet<>(model.newKeys));
+        model.obsoleteKeys = new ArrayList<>(new HashSet<>(model.obsoleteKeys));
         for (Localization i : model.list) {
             while (model.newKeys.contains(i.key)) {
                 model.newKeys.remove(i.key);
             }
         }
 
+        while (model.newKeys.removeAll(ignoreList))
+            ;
         for (String i : model.newKeys) {
             Localization loc = new Localization(i, null,
                     MessagesResource.DEFAULT_LANGUAGE);
             model.list.add(loc);
         }
-
-        return ok(views.html.MessagesController.index.render(model));
+        return model;
     }
 
     /**
@@ -123,7 +139,7 @@ public class MessagesController extends Controller {
                 .bindFromRequest();
         final Localization m = model.get();
 
-        SaveModel response = new SaveModel();
+        ValueModel response = new ValueModel();
         response.notification = new Notification();
 
         boolean restore = false;
@@ -158,21 +174,20 @@ public class MessagesController extends Controller {
             }
         }
 
-        return ok(views.html.MessagesController.save.render(response));
+        return ok(Json.toJson(response));
     }
 
     /**
      * Deletes a key from all localizations.
      * 
-     * @return Result with the key (if delete failed) or an empty string (if
-     *         delete successful) and a notification.
+     * @return Result with a success flag and a notification.
      */
     public static Result delete() {
         String key = form().bindFromRequest().get("key");
 
-        SaveModel response = new SaveModel();
+        SuccessModel response = new SuccessModel();
         response.notification = new Notification();
-        response.value = key;
+        response.success = false;
 
         MessagesResource messagesResource = MessagesResource.instance();
         if (!StringUtils.isBlank(key)) {
@@ -183,7 +198,7 @@ public class MessagesController extends Controller {
                             Arrays.asList(new String[] { key }));
                 }
 
-                response.value = "";
+                response.success = true;
                 response.notification.notificationType = "success";
                 response.notification.message = Messages.get("delete.success",
                         key);
@@ -197,7 +212,167 @@ public class MessagesController extends Controller {
             response.notification.message = Messages.get("delete.novalue", key);
         }
 
-        return ok(views.html.MessagesController.save.render(response));
+        return ok(Json.toJson(response));
+    }
+
+    /**
+     * Adds a key to the keep list.
+     * 
+     * @return Result with a success flag and a notification.
+     */
+    public static Result keep() {
+        String key = form().bindFromRequest().get("key");
+
+        SuccessModel response = new SuccessModel();
+        response.notification = new Notification();
+        response.success = false;
+
+        MessagesResource messagesResource = MessagesResource.instance();
+        if (!StringUtils.isBlank(key)) {
+
+            try {
+                messagesResource.keep(key);
+
+                response.success = true;
+                response.notification.notificationType = "success";
+                response.notification.message = Messages.get("keep.success",
+                        key);
+            } catch (Exception e) {
+                response.notification.message = Messages.get("keep.error",
+                        e.getMessage());
+                response.notification.notificationType = "error";
+            }
+        } else {
+            response.notification.notificationType = "alert";
+            response.notification.message = Messages.get("keep.novalue", key);
+        }
+
+        return ok(Json.toJson(response));
+    }
+
+    /**
+     * Removes a key from the keep list.
+     * 
+     * @return Result with the key (if unkeep failed) or an empty string (if
+     *         unkeep successful) and a notification.
+     */
+    public static Result unkeep() {
+        String key = form().bindFromRequest().get("key");
+
+        SuccessModel response = new SuccessModel();
+        response.notification = new Notification();
+        response.success = false;
+
+        MessagesResource messagesResource = MessagesResource.instance();
+        if (!StringUtils.isBlank(key)) {
+
+            try {
+                messagesResource.removeKeep(key);
+
+                response.success = true;
+                response.notification.notificationType = "success";
+                response.notification.message = Messages.get("unkeep.success",
+                        key);
+            } catch (Exception e) {
+                response.notification.message = Messages.get("unkeep.error",
+                        e.getMessage());
+                response.notification.notificationType = "error";
+            }
+        } else {
+            response.notification.notificationType = "alert";
+            response.notification.message = Messages.get("unkeep.novalue", key);
+        }
+
+        return ok(Json.toJson(response));
+    }
+
+    /**
+     * Adds a key to the ignore list.
+     * 
+     * @return Result with the key (if ignore failed) or an empty string (if
+     *         ignore successful) and a notification.
+     */
+    public static Result ignore() {
+        String key = form().bindFromRequest().get("key");
+
+        SuccessModel response = new SuccessModel();
+        response.notification = new Notification();
+        response.success = false;
+
+        MessagesResource messagesResource = MessagesResource.instance();
+        if (!StringUtils.isBlank(key)) {
+
+            try {
+                ArrayList<String> list = new ArrayList<>();
+                list.add(key);
+                messagesResource.ignoreAll(list);
+
+                response.success = true;
+                response.notification.notificationType = "success";
+                response.notification.message = Messages.get("ignore.success",
+                        key);
+            } catch (Exception e) {
+                response.notification.message = Messages.get("ignore.error",
+                        e.getMessage());
+                response.notification.notificationType = "error";
+            }
+        } else {
+            response.notification.notificationType = "alert";
+            response.notification.message = Messages.get("ignore.novalue", key);
+        }
+
+        return ok(Json.toJson(response));
+    }
+
+    /**
+     * Removes a key or all keys from the ignore list.
+     * 
+     * @return Result with the unignored keys and a notification.
+     */
+    public static Result unignore() {
+        String key = form().bindFromRequest().get("key");
+
+        IndexModel model = null;
+        Notification n = new Notification();
+
+        MessagesResource messagesResource = MessagesResource.instance();
+
+        List<String> keys = new ArrayList<>();
+        if (!StringUtils.isBlank(key)) {
+            keys.add(key);
+        } else {
+            keys = messagesResource.loadIgnoreList();
+        }
+
+        if (keys.size() > 0) {
+            try {
+                messagesResource.unignoreAll(keys);
+
+                model = getIndexModel();
+                List<Localization> newList = new ArrayList<>();
+                for (Localization i : model.list) {
+                    if (keys.contains(i.key)) {
+                        newList.add(i);
+                    }
+                }
+                model.list = newList;
+
+                n.notificationType = "success";
+                if (keys.size() == 1) {
+                    n.message = Messages.get("unignore.success", keys.get(0));
+                } else {
+                    n.message = Messages.get("unignore.all.success", key);
+                }
+            } catch (Exception e) {
+                n.message = Messages.get("unignore.error", e.getMessage());
+                n.notificationType = "error";
+            }
+        } else {
+            n.notificationType = "alert";
+            n.message = Messages.get("unignore.novalue");
+        }
+
+        return ok(views.html.MessagesController.addRows.render(model, n));
     }
 
     /**

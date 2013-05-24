@@ -12,126 +12,50 @@
     <script src="@routes.Assets.at("javascripts/ColVis.min.js")" type="text/javascript"></script>
     <script src="@routes.Assets.at("javascripts/jquery.jeditable.js")" type="text/javascript"></script>
     <script src="@routes.Assets.at("javascripts/notify.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.at("javascripts/main.js")" type="text/javascript"></script>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
     <link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
     <link rel="stylesheet" href="@routes.Assets.at("stylesheets/ColVis.css")">
     <link rel="stylesheet" href="@routes.Assets.at("stylesheets/main.css")">
     <link rel="stylesheet" href="@routes.Assets.at("stylesheets/notify.css")">
+    <link rel="stylesheet" href="@routes.Assets.at("stylesheets/hint.css")">
+    <script type="text/javascript">
+    $(function() {
+        window.urls = {
+            deleteUrl: '@routes.MessagesController.delete()',
+            keepUrl: '@routes.MessagesController.keep()',
+            unkeepUrl: '@routes.MessagesController.unkeep()',
+            ignoreUrl: '@routes.MessagesController.ignore()',
+            unignoreUrl: '@routes.MessagesController.unignore()',
+            saveUrl: '@routes.MessagesController.save()'
+        };
+    });
+    </script>
 </head>
 
 <body>
 
+<div class="header">
+    <div class="legend">
+        <div class="title">@Messages("datatable.legend"):</div>
+        <div class="normal hint--bottom" data-hint="@Messages("datatable.normal.info")">@Messages("datatable.normal")</div>@*
+        *@<div class="new hint--bottom" data-hint="@Messages("datatable.new.info")">@Messages("datatable.new")</div>@*
+        *@<div class="obsolete hint--bottom" data-hint="@Messages("datatable.obsolete.info")">@Messages("datatable.obsolete")</div>@*
+        *@<div class="missing hint--bottom" data-hint="@Messages("datatable.missing.info")">@Messages("datatable.missing")</div>
+    </div>
+    <div>
+        <div class="title">@Messages("index.ignored", model.ignoreList.size())</div>
+        <div>
+            <a href="javascript:void(0)" onclick="fnUnignoreAll()">@Messages("index.ignored.restore")</a>
+        </div>
+    </div>
+</div>
+
 <div class="notification-area"></div>
 
-<div class="legend">
-<span>@Messages("datatable.legend")</span>
-<div class="normal">@Messages("datatable.normal")</div>@*
-*@<div class="new">@Messages("datatable.new")</div>@*
-*@<div class="obsolete">@Messages("datatable.obsolete")</div>@*
-*@<div class="missing">@Messages("datatable.missing")</div>
-</div>
-
 <div class="main">
-<table id="table">
-<thead>
-<th>@Messages("datatable.key")</th>
-@for(key <- model.langs){
-    <th name="@key">@key</th>
-}
-</thead>
-<tbody>
-@for((key, value) <- model.list.groupBy(_.key)){
-    <tr name="@key" class="@if(model.newKeys.contains(key)) { new } else { @if(model.obsoleteKeys.contains(key)) { obsolete }}">
-        <td>
-            @if(model.obsoleteKeys.contains(key)) {
-            <a href="javascript:void(0)" onclick="fnDeleteKey('@key')"><img src="@routes.Assets.at("images/delete.png")" alt="delete" /></a>
-            } else {
-            <a href="#" class="show-sources"><img src="@routes.Assets.at("images/code.png")" alt="code" /></a>   
-            }
-            <span class="key">@key</span>
-        </td>
-    @defining(value.groupBy(_.locale)) { curLocales => 
-    @for(lkey <- model.langs){
-        @if(curLocales.contains(lkey)){
-            <td class="edit">@curLocales(lkey)(0).value</td>
-        }else{
-            <td class="edit @if(model.newKeys.contains(key)) { new } else { @if(model.obsoleteKeys.contains(key)) { obsolete } else { missing }}"></td>
-        }
-    }
-    }
-    </tr>
-}
-</tbody>
-</table>
-</div>
-<script type="text/javascript">
 
-function fnDeleteKey(key) {
-    $.ajax('@routes.MessagesController.delete()', {
-        type: "POST",
-        data: {
-            key: key
-        }
-    }).done(function(msg) {
-        $("div.notification-area").html(msg);
-        var failed = $("div.notification-area div.value").text();
-        debugger;
-        if (!failed) {
-            var oTable = $('#table').dataTable();
-            oTable.fnDeleteRow( $('#table tr[name="'+key+'"]').get(0) );
-        }
-    });
-}
-
-$(document).ready(function() {
-    var oTable = $('#table').dataTable({
-        bAutoWidth: false,
-        iDisplayLength: 50,
-        sDom: 'C<"clear">lfrtip',
-        oColVis: {
-            "activate": "mouseover",
-            "aiExclude": [0]
-        }
-    });
-    new FixedHeader(oTable, {
-        //left: true
-    });    
-    
-    oTable.$('td.edit').editable('@routes.MessagesController.save()', {
-        //type: "textarea",
-        //cancel: "Cancel",
-        //submit: "Save",
-        callback: function(value, settings) {
-            var td = $(this).closest("td");
-            if ($(this).text()) {
-                if(td.hasClass("new")) {
-                    td.removeClass("new");
-                    $(this).closest("tr").removeClass("new");
-                    $(this).siblings("td.edit").removeClass("new").addClass("missing");
-                }
-                
-                td.removeClass("missing");
-            } else {
-                td.addClass("missing");
-            }
-            
-            $("div.notification-area").html(value);
-            $(this).text($("div.notification-area div.value").text());
-        },
-        submitdata: function(value, settings) {
-            var index = oTable.fnGetPosition(this)[2];
-            var col = $("#table th:nth-child(" + (index + 1) + ")");
-            
-            return {
-                key: this.parentNode.getAttribute('name'),
-                locale: col.attr("name")
-            };
-        },
-        height: "100%",
-        width: "100%"
-    });
-});
-</script>
+@_table(model)
 
 <div id="sources">
     <div id="sources-target"></div>
