@@ -43,6 +43,7 @@ function makejEditable(obj) {
             }
         },
         submitdata: function(value, settings) {
+            var oTable = $('#table').dataTable();
             var index = oTable.fnGetPosition(this)[2];
             var col = $("#table th:nth-child(" + (index + 1) + ")");
             

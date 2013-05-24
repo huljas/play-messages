@@ -5,13 +5,19 @@ div.notification-area { display: none; }
 div.FixedHeader_Cloned { z-index: 0 !important; }
 div.FixedHeader_Cloned th { background-color: white; }
 
-div.legend { display: block; width: auto; margin: 0px 8px; padding: 5px; padding-bottom: 8px; background-color: #fafafa; border-radius: 0px 0px 12px 12px; box-shadow: 1px 0px 3px; }
-div.legend span { font-weight: bold; margin: 0px 8px; }
-div.legend div { display: inline; padding: 5px; margin: 0px; border-bottom: 1px solid grey; }
-div.legend div:nth-child(2) { margin-left: 8px; border-bottom-left-radius: 12px; border-left: 1px solid grey; }
-div.legend div:last-child { border-bottom-right-radius: 12px; border-right: 1px solid grey; }
+div.header { display: block; width: auto; margin: 0px 8px; padding: 5px; padding-bottom: 8px; background-color: #fafafa; border-radius: 0px 0px 12px 12px; box-shadow: 1px 0px 3px; }
+div.header > div { display: inline; margin-right: 20px; margin-left: 4px; }
+div.header div > .title { display: inline; font-weight: bold; margin: 0px 8px; }
+div.header div div:not(.title) { display: inline; padding: 5px; margin: 0px; border-bottom: 1px solid grey; }
+div.header div div:not(.title):nth-child(2) { margin-left: 8px; border-bottom-left-radius: 12px; border-left: 1px solid grey; }
+div.header div div:last-child { border-bottom-right-radius: 12px; border-right: 1px solid grey; }
 
 div.main { margin: 8px; }
+
+table.dataTable tr.obsolete .btn-sources { display: none; }
+table.dataTable tr:not(.obsolete) .btn-delete { display: none; }
+table.dataTable tr:not(.obsolete) .btn-keep { display: none; }
+table.dataTable tr:not(.keep) .btn-unkeep { display: none; }
 
 table.dataTable img { height: 1em; }
 

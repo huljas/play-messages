@@ -95,6 +95,7 @@
         var onsubmit = settings.onsubmit || function() { };
         var onreset  = settings.onreset  || function() { };
         var onerror  = settings.onerror  || reset;
+        var intercept = settings.intercept || function(s) {return s; };
           
         /* Show tooltip. */
         if (settings.tooltip) {
@@ -343,6 +344,8 @@
                                   dataType: 'html',
                                   url     : settings.target,
                                   success : function(result, status) {
+									  result = intercept.apply(self, [result]);
+
                                       if (ajaxoptions.dataType == 'html') {
                                         $(self).html(result);
                                       }
