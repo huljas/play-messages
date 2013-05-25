@@ -114,7 +114,7 @@
 .notify-alert span{
         display: block;
         margin: 0 auto;
-        background-image: url(./images/loading.gif);
+        background-image: url(../images/ajax-loader.gif);
         background-position: 2px 2px;
         background-repeat: no-repeat;
         width: 150px;
@@ -125,7 +125,7 @@
         margin: 5px;
         height: 40px;
         width: 40px;
-        background: url(close.png) 10px 10px no-repeat;
+        background: url(../images/close.png) 10px 10px no-repeat;
 }
 
 .notify-hidden .notify-close{
