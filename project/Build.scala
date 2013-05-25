@@ -5,7 +5,7 @@ import play.Project._
 object ApplicationBuild extends Build {
 
   val appName         = "play-messages"
-  val appVersion      = "1.0-SNAPSHOT"
+  val appVersion      = "2.0"
 
   val appDependencies = Seq(
     // Add your project dependencies here,
@@ -15,7 +15,10 @@ object ApplicationBuild extends Build {
   )
 
   val main = play.Project(appName, appVersion, appDependencies).settings(
-    // Add your own project settings here      
+    organization := "de.corux",
+    
+    // global template imports
+    templatesImport += "controllers.playmessages.routes"
   )
 
 }
