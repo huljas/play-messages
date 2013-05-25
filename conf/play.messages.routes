@@ -1,0 +1,16 @@
+# This file defines all module routes (Higher priority routes first)
+#
+# import these routes in the main app as :
+# ->     /@messages      play.messages.Routes
+#
+# ~~~~
+
+GET    /               controllers.playmessages.MessagesController.index()
+POST   /update         controllers.playmessages.MessagesController.save()
+POST   /delete         controllers.playmessages.MessagesController.delete()
+POST   /keep           controllers.playmessages.MessagesController.keep()
+POST   /unkeep         controllers.playmessages.MessagesController.unkeep()
+POST   /ignore         controllers.playmessages.MessagesController.ignore()
+POST   /unignore       controllers.playmessages.MessagesController.unignore()
+POST   /sources        controllers.playmessages.MessagesController.sources()
+GET    /assets/*file   controllers.playmessages.Assets.at(path="/public/playmessages", file)

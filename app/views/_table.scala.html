@@ -17,7 +17,7 @@
 <script type="text/javascript">
 
 function makejEditable(obj) {
-    obj.editable('@routes.MessagesController.save()', {
+    obj.editable('@playmessages.routes.MessagesController.save()', {
         //type: "textarea",
         //cancel: "Cancel",
         //submit: "Save",
@@ -30,15 +30,16 @@ function makejEditable(obj) {
         },
         callback: function(value, settings) {
             var td = $(this).closest("td");
+            var tr = $(this).closest("tr");
             if ($(this).text()) {
-                if(td.hasClass("new")) {
-                    td.removeClass("new");
-                    $(this).closest("tr").removeClass("new");
-                    $(this).siblings("td.edit").removeClass("new").addClass("missing");
+                if(tr.hasClass("new")) {
+                    tr.removeClass("new");
+                    tr.find(".new").removeClass("new");
+                    $(this).siblings("td.edit").addClass("missing");
                 }
                 
                 td.removeClass("missing");
-            } else {
+            } else if (!tr.hasClass("new")) {
                 td.addClass("missing");
             }
         },

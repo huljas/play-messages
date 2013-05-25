@@ -1,4 +1,4 @@
-package controllers;
+package controllers.playmessages;
 
 import static play.data.Form.form;
 
@@ -17,8 +17,8 @@ import messageutils.SourceKeys;
 import models.IndexModel;
 import models.Localization;
 import models.Notification;
-import models.ValueModel;
 import models.SuccessModel;
+import models.ValueModel;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -26,8 +26,8 @@ import play.data.Form;
 import play.i18n.Lang;
 import play.i18n.Messages;
 import play.libs.Json;
-import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.Controller;
 
 /**
  * @author huljas

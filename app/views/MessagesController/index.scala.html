@@ -22,12 +22,12 @@
     <script type="text/javascript">
     $(function() {
         window.urls = {
-            deleteUrl: '@routes.MessagesController.delete()',
-            keepUrl: '@routes.MessagesController.keep()',
-            unkeepUrl: '@routes.MessagesController.unkeep()',
-            ignoreUrl: '@routes.MessagesController.ignore()',
-            unignoreUrl: '@routes.MessagesController.unignore()',
-            saveUrl: '@routes.MessagesController.save()'
+            deleteUrl: '@playmessages.routes.MessagesController.delete()',
+            keepUrl: '@playmessages.routes.MessagesController.keep()',
+            unkeepUrl: '@playmessages.routes.MessagesController.unkeep()',
+            ignoreUrl: '@playmessages.routes.MessagesController.ignore()',
+            unignoreUrl: '@playmessages.routes.MessagesController.unignore()',
+            saveUrl: '@playmessages.routes.MessagesController.save()'
         };
     });
     </script>
@@ -48,6 +48,9 @@
         <div>
             <a href="javascript:void(0)" onclick="fnUnignoreAll()">@Messages("index.ignored.restore")</a>
         </div>
+    </div>
+    <div>
+        
     </div>
 </div>
 
@@ -71,7 +74,7 @@ $(function(){
         });
         $("#sources-target")
             .html('<div class="loading"></div>')
-            .load('@routes.MessagesController.sources', {
+            .load('@playmessages.routes.MessagesController.sources', {
                 key:key
             });
         return false;

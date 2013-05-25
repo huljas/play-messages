@@ -196,6 +196,11 @@ public class DefaultMessagesResource extends MessagesResource {
         }
     }
 
+    private static String encode(String str) {
+        return str.replace("\r", "\\r").replace("\n", "\\n")
+                .replace("=", "\\=");
+    }
+
     protected void saveMessages(String language, Map<String, String> messages) {
         try {
             String lineEnding = System.getProperty("line.separator");
@@ -209,7 +214,8 @@ public class DefaultMessagesResource extends MessagesResource {
             Object[] keys = messages.keySet().toArray();
             Arrays.sort(keys);
             for (Object key : keys) {
-                lines.add(String.format("%s = %s", key, messages.get(key)));
+                lines.add(String.format("%s = %s", encode(key.toString()),
+                        encode(messages.get(key))));
             }
 
             IOUtils.writeLines(lines, lineEnding, fileWriter);
