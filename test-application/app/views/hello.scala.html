@@ -1,0 +1,38 @@
+@(hello: String)
+
+@main(Messages("title")) {
+    
+    <div class="lang-select section">
+    <strong>@Messages("changeLang"):</strong>
+    @for(i <- controllers.LocalizedApplication.getLangs()) {
+        <a href="@routes.LocalizedApplication.setLang(i)">@i</a>&nbsp;
+    }
+    </div>
+    
+    @if(hello != null && hello != "") {
+        <div class="hello section">
+        @hello
+        </div>
+    }
+    
+    <div class="say section">
+    @helper.form(routes.LocalizedApplication.hello()) {
+        <input name="name" type="text" value="@Messages("giveYourName")"/>
+        <input type="submit" value="@Messages("sayHello")"/>
+    }
+    <br>
+    @helper.form(routes.LocalizedApplication.helloWithType()) {
+        <input style="float:left" name="name" type="text" value="@Messages("giveYourName")"/>
+    
+        <div style="float:left">
+        <label><input type="radio" name="type" value="happy" checked/>@Messages("happy")</label>
+        <label><input type="radio" name="type" value="quick"/>@Messages("quick")</label>
+        <label><input type="radio" name="type" value="normal"/>@Messages("normal")</label>
+        <label><input type="radio" name="type" value="loud"/>@Messages("loud")</label>
+        </div>
+        <input style="float:left" type="submit" value="@Messages("sayHello")"/>
+        <div style="clear:both"></div>
+    }
+    </div>
+        
+}
