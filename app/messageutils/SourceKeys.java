@@ -29,7 +29,7 @@ public class SourceKeys {
 
     public static SourceKeys lookUp() {
         SourceKeys foundKeys = new SourceKeys();
-        MessageKeyMatcher matcher = new MessageKeyMatcher();
+        KeyMatcher matcher = KeyMatcher.instance();
         String s = MessagesUtil.getConfig("messages.srcDir", "app");
 
         String[] paths = s.split(Pattern.quote(","));

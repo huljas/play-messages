@@ -1,8 +1,5 @@
 package messageutils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -10,7 +7,7 @@ import java.util.regex.Pattern;
  * 
  * @author huljas
  */
-public class MessageKeyMatcher {
+public class MessageKeyMatcher extends KeyMatcher {
 
     final String REGEXP1 = "\\QMessages.get(\"\\E([^\"]*)\"";
     final String REGEXP2 = "\\QValidation\\E\\Q.addError(\\E[^,]*,[^\"]*[\"]([^\"]*)\"";
@@ -20,39 +17,17 @@ public class MessageKeyMatcher {
     final String REGEXP6 = "\\Qi18n(\'\\E([^\']*)\'";
     final String REGEXP7 = "\\Qmessages.getMessage(\\E[^,]*,[\\s]*'([^']*)'";
 
-    private List<Pattern> patterns = new ArrayList<Pattern>();
-
     /**
      * Creates a new instance of the {@link MessageKeyMatcher}.
      */
     public MessageKeyMatcher() {
-        patterns.add(Pattern.compile(REGEXP1));
-        patterns.add(Pattern.compile(REGEXP2));
-        patterns.add(Pattern.compile(REGEXP3));
-        patterns.add(Pattern.compile(REGEXP4));
-        patterns.add(Pattern.compile(REGEXP5));
-        patterns.add(Pattern.compile(REGEXP6));
-        patterns.add(Pattern.compile(REGEXP7));
-    }
-
-    /**
-     * Returns all localization keys found on given string.
-     * 
-     * @param s
-     *            The line to search for keys.
-     * @return List of all found keys.
-     */
-    public List<String> match(String s) {
-        List<String> list = new ArrayList<String>();
-        for (Pattern pattern : patterns) {
-            Matcher matcher = pattern.matcher(s);
-            int start = 0;
-            while (matcher.find(start) && matcher.groupCount() == 1) {
-                list.add(matcher.group(1));
-                start = matcher.end();
-            }
-        }
-        return list;
+        addPattern(Pattern.compile(REGEXP1));
+        addPattern(Pattern.compile(REGEXP2));
+        addPattern(Pattern.compile(REGEXP3));
+        addPattern(Pattern.compile(REGEXP4));
+        addPattern(Pattern.compile(REGEXP5));
+        addPattern(Pattern.compile(REGEXP6));
+        addPattern(Pattern.compile(REGEXP7));
     }
 
 }
