@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import play.Play;
 
@@ -51,13 +52,24 @@ public class SourceKeys {
                     File file = iterator.next();
                     List<String> lines = IOUtils.readLines(new FileReader(file));
                     int i = 0;
+                    String prevLine = null;
                     for (String line : lines) {
                         List<String> keys = matcher.match(line);
+                        if (keys.size() == 0 && !StringUtils.isBlank(prevLine)) {
+                            keys = matcher.match(prevLine.trim() + line.trim());
+                        }
+
                         for (String key : keys) {
                             String snippet = getSnippet(key, i, lines);
                             foundKeys.addKey(key, file, snippet, i);
                         }
                         i++;
+
+                        if (keys.size() > 0) {
+                            prevLine = null;
+                        } else {
+                            prevLine = line;
+                        }
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
