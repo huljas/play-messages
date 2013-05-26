@@ -19,6 +19,7 @@ table.dataTable tr:not(.obsolete) .btn-delete { display: none; }
 table.dataTable tr:not(.obsolete) .btn-keep { display: none; }
 table.dataTable tr:not(.keep) .btn-unkeep { display: none; }
 
+table.dataTable tr td:first-child { white-space: nowrap; }
 table.dataTable tr td:first-child * { display: inline-block; }
 table.dataTable img { height: 1em; }
 
