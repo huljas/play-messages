@@ -14,7 +14,7 @@
         <a href="javascript:void(0)" onclick="fnDeleteKey('@key')" class="btn-delete hint--top" data-hint="@Messages("index.delete")">
             <span class="ui-icon ui-icon-trash"></span>
         </a>
-        <a href="#" class="btn-sources show-sources hint--top" data-hint="@Messages("index.showusages", model.sources.getKeySourceList(key).listSourceFiles().size())">
+        <a href="javascript:void(0)" onclick="fnShowSources('@key')" class="btn-sources hint--top" data-hint="@Messages("index.showusages", model.sources.getKeySourceList(key).listSourceFiles().size())">
             <span class="ui-icon ui-icon-search"></span>
         </a>
         <span class="key">@key</span>

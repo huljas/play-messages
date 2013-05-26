@@ -11,6 +11,18 @@ function handleResult(result) {
 	}
 }
 
+function fnShowSources(key) {
+    $("#sources").dialog('open').dialog('option', {
+        title: $("#sources").attr("name") + ' "'+key+'"',
+        maxHeight: 600
+    });
+    $("#sources-target")
+        .html('<div class="loading"></div>')
+        .load(window.urls.sourcesUrl, {
+            key:key
+        });
+}
+
 function fnDeleteKey(key) {
     $.ajax(window.urls.deleteUrl, {
         type: "POST",

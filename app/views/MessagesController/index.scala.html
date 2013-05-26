@@ -27,7 +27,8 @@
             unkeepUrl: '@playmessages.routes.MessagesController.unkeep()',
             ignoreUrl: '@playmessages.routes.MessagesController.ignore()',
             unignoreUrl: '@playmessages.routes.MessagesController.unignore()',
-            saveUrl: '@playmessages.routes.MessagesController.save()'
+            saveUrl: '@playmessages.routes.MessagesController.save()',
+            sourcesUrl: '@playmessages.routes.MessagesController.sources()'
         };
     });
     </script>
@@ -60,26 +61,12 @@
 
 @_table(model)
 
-<div id="sources">
+<div id="sources" name="@Messages("sources.header")">
     <div id="sources-target"></div>
 </div>
 
 <script type="text/javascript">
 $(function(){
-    $(".show-sources").click(function() {
-        var key = $(this).closest("tr").attr("name");
-        $("#sources").dialog('open').dialog('option', {
-            title:'@Messages("sources.header") "'+key+'"',
-            maxHeight: 600
-        });
-        $("#sources-target")
-            .html('<div class="loading"></div>')
-            .load('@playmessages.routes.MessagesController.sources', {
-                key:key
-            });
-        return false;
-    });
-
     $("#sources").dialog({
         autoOpen: false, 
         modal: true, 
@@ -89,7 +76,6 @@ $(function(){
     $('.ui-widget-overlay').live('click', function() {
          $('#sources').dialog( "close" );
     });
-
 });
 </script>
 </body>
