@@ -37,7 +37,15 @@ public class SourceKeys {
         String separator = System.getProperty("file.separator");
 
         for (String path : paths) {
-            Iterator<File> iterator = FileUtils.iterateFiles(new File(applicationPath + separator + path), new String[]{"java", "html", "js"}, true);
+            File filePath = new File(applicationPath + separator + path);
+
+            // Skip non-existing paths
+            if (!filePath.exists()) {
+                continue;
+            }
+
+            Iterator<File> iterator = FileUtils.iterateFiles(filePath,
+                    new String[] { "java", "html", "js" }, true);
             while (iterator.hasNext()) {
                 try {
                     File file = iterator.next();
