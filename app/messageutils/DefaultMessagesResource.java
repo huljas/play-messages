@@ -4,8 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -13,7 +11,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,6 +36,7 @@ public class DefaultMessagesResource extends MessagesResource {
 
     protected File targetDir;
     private String defaultLanguage;
+    private boolean unobtrusive;
 
     /**
      * Gets the default language configured by the application or an empty
@@ -59,6 +57,7 @@ public class DefaultMessagesResource extends MessagesResource {
         targetDir = new File(applicationPath + separator
                 + MessagesUtil.getConfig("messages.targetDir", "conf"));
         defaultLanguage = getDefaultLanguage();
+        unobtrusive = MessagesUtil.getConfig("messages.unobtrusive", false);
     }
 
     @Override
@@ -206,17 +205,54 @@ public class DefaultMessagesResource extends MessagesResource {
             String lineEnding = System.getProperty("line.separator");
             File file = getMessagesFile(language);
             Collection<String> lines = new ArrayList<>();
-            lines.add("# Saved by play-messages");
-            lines.add(String.format("# %s", new Date()));
-            BufferedWriter fileWriter = new BufferedWriter(
-                    new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
 
-            Object[] keys = messages.keySet().toArray();
-            Arrays.sort(keys);
-            for (Object key : keys) {
+            List<String> keys = new ArrayList<>(messages.keySet());
+            
+            if (unobtrusive) {
+                List<String> existing = IOUtils.readLines(new FileInputStream(
+                        file));
+
+                for (String i : existing) {
+                    if (i.trim().isEmpty() || i.trim().startsWith("#")
+                            || !i.contains("=")) {
+                        // preserve comments and empty/invalid lines
+                        lines.add(i);
+                    } else {
+                        String existingKey = i.substring(0, i.indexOf("="));
+                        String eKey = existingKey.trim();
+
+                        if (messages.containsKey(eKey)) {
+                            String existingValue = i
+                                    .substring(i.indexOf("=") + 1);
+                            String preWhitespace = existingValue.substring(
+                                    0,
+                                    existingValue.length()
+                                            - StringUtils.stripStart(
+                                                    existingValue, null)
+                                                    .length());
+                            String newValue = messages.get(eKey);
+                            lines.add(String.format("%s=%s%s", existingKey,
+                                    preWhitespace, encode(newValue)));
+
+                            while (keys.remove(eKey))
+                                ;
+                        }
+                    }
+                }
+            } else {
+                lines.add("# Saved by play-messages");
+                lines.add(String.format("# %s", new Date()));
+            }
+            
+            Object[] keysN = keys.toArray();
+            Arrays.sort(keysN);
+            for (Object key : keysN) {
                 lines.add(String.format("%s = %s", encode(key.toString()),
                         encode(messages.get(key))));
             }
+
+            BufferedWriter fileWriter = new BufferedWriter(
+                    new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
 
             IOUtils.writeLines(lines, lineEnding, fileWriter);
             IOUtils.closeQuietly(fileWriter);
