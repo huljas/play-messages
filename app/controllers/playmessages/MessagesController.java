@@ -22,12 +22,12 @@ import models.ValueModel;
 
 import org.apache.commons.lang3.StringUtils;
 
-import play.data.Form;
+import play.Routes;
 import play.i18n.Lang;
 import play.i18n.Messages;
 import play.libs.Json;
-import play.mvc.Result;
 import play.mvc.Controller;
+import play.mvc.Result;
 
 /**
  * @author huljas
@@ -59,6 +59,23 @@ public class MessagesController extends Controller {
         IndexModel model = getIndexModel();
 
         return ok(views.html.MessagesController.index.render(model));
+    }
+
+    /**
+     * Generates reverse routing for JavaScript.
+     * 
+     * @return JavaScript reverse routes.
+     */
+    public static Result javascriptRoutes() {
+        response().setContentType("text/javascript");
+        return ok(Routes.javascriptRouter("jsRoutes",
+                routes.javascript.MessagesController.delete(),
+                routes.javascript.MessagesController.ignore(),
+                routes.javascript.MessagesController.keep(),
+                routes.javascript.MessagesController.save(),
+                routes.javascript.MessagesController.sources(),
+                routes.javascript.MessagesController.unignore(),
+                routes.javascript.MessagesController.unkeep()));
     }
 
     private static IndexModel getIndexModel() {
@@ -136,26 +153,23 @@ public class MessagesController extends Controller {
      *         notification.
      */
     public static Result save() {
-        final Form<Localization> model = form(Localization.class)
-                .bindFromRequest();
-        final Localization m = model.get();
-
+        Localization model = form(Localization.class).bindFromRequest().get();
         ValueModel response = new ValueModel();
         response.notification = new Notification();
-
         boolean restore = false;
         MessagesResource messagesResource = MessagesResource.instance();
-        if (!StringUtils.isBlank(m.key) && !StringUtils.isBlank(m.value)) {
+        if (!StringUtils.isBlank(model.key)
+                && !StringUtils.isBlank(model.value)) {
 
             try {
-                messagesResource.save(m.locale, m.key, m.value);
-                response.value = m.value;
+                messagesResource.save(model.locale, model.key, model.value);
+                response.value = model.value;
                 response.notification.notificationType = "success";
                 response.notification.message = Messages.get("save.success",
-                        m.key, m.locale);
+                        model.key, model.locale);
             } catch (Exception e) {
                 response.notification.message = Messages.get("save.error",
-                        e.getMessage());
+                        model.key, model.locale, e.getMessage());
                 response.notification.notificationType = "error";
 
                 restore = true;
@@ -163,13 +177,15 @@ public class MessagesController extends Controller {
         } else {
             restore = true;
             response.notification.notificationType = "alert";
-            response.notification.message = Messages.get("save.novalue", m.key);
+            response.notification.message = Messages.get("save.novalue",
+                    model.key, model.locale);
         }
 
         if (restore) {
-            Map<String, String> msgs = messagesResource.loadMessages(m.locale);
-            if (msgs.containsKey(m.key)) {
-                response.value = msgs.get(m.key);
+            Map<String, String> msgs = messagesResource
+                    .loadMessages(model.locale);
+            if (msgs.containsKey(model.key)) {
+                response.value = msgs.get(model.key);
             } else {
                 response.value = "";
             }
@@ -181,11 +197,12 @@ public class MessagesController extends Controller {
     /**
      * Deletes a key from all localizations.
      * 
+     * @param key
+     *            The key to delete.
+     * 
      * @return Result with a success flag and a notification.
      */
-    public static Result delete() {
-        String key = form().bindFromRequest().get("key");
-
+    public static Result delete(final String key) {
         SuccessModel response = new SuccessModel();
         response.notification = new Notification();
         response.success = false;
@@ -205,7 +222,7 @@ public class MessagesController extends Controller {
                         key);
             } catch (Exception e) {
                 response.notification.message = Messages.get("delete.error",
-                        e.getMessage());
+                        key, e.getMessage());
                 response.notification.notificationType = "error";
             }
         } else {
@@ -219,11 +236,12 @@ public class MessagesController extends Controller {
     /**
      * Adds a key to the keep list.
      * 
+     * @param key
+     *            The key to keep.
+     * 
      * @return Result with a success flag and a notification.
      */
-    public static Result keep() {
-        String key = form().bindFromRequest().get("key");
-
+    public static Result keep(final String key) {
         SuccessModel response = new SuccessModel();
         response.notification = new Notification();
         response.success = false;
@@ -239,7 +257,7 @@ public class MessagesController extends Controller {
                 response.notification.message = Messages.get("keep.success",
                         key);
             } catch (Exception e) {
-                response.notification.message = Messages.get("keep.error",
+                response.notification.message = Messages.get("keep.error", key,
                         e.getMessage());
                 response.notification.notificationType = "error";
             }
@@ -254,12 +272,13 @@ public class MessagesController extends Controller {
     /**
      * Removes a key from the keep list.
      * 
+     * @param key
+     *            The key to unkeep.
+     * 
      * @return Result with the key (if unkeep failed) or an empty string (if
      *         unkeep successful) and a notification.
      */
-    public static Result unkeep() {
-        String key = form().bindFromRequest().get("key");
-
+    public static Result unkeep(final String key) {
         SuccessModel response = new SuccessModel();
         response.notification = new Notification();
         response.success = false;
@@ -276,7 +295,7 @@ public class MessagesController extends Controller {
                         key);
             } catch (Exception e) {
                 response.notification.message = Messages.get("unkeep.error",
-                        e.getMessage());
+                        key, e.getMessage());
                 response.notification.notificationType = "error";
             }
         } else {
@@ -290,12 +309,13 @@ public class MessagesController extends Controller {
     /**
      * Adds a key to the ignore list.
      * 
+     * @param key
+     *            The key to ignore.
+     * 
      * @return Result with the key (if ignore failed) or an empty string (if
      *         ignore successful) and a notification.
      */
-    public static Result ignore() {
-        String key = form().bindFromRequest().get("key");
-
+    public static Result ignore(final String key) {
         SuccessModel response = new SuccessModel();
         response.notification = new Notification();
         response.success = false;
@@ -314,7 +334,7 @@ public class MessagesController extends Controller {
                         key);
             } catch (Exception e) {
                 response.notification.message = Messages.get("ignore.error",
-                        e.getMessage());
+                        key, e.getMessage());
                 response.notification.notificationType = "error";
             }
         } else {
@@ -328,11 +348,12 @@ public class MessagesController extends Controller {
     /**
      * Removes a key or all keys from the ignore list.
      * 
+     * @param key
+     *            The key to unignore.
+     * 
      * @return Result with the unignored keys and a notification.
      */
-    public static Result unignore() {
-        String key = form().bindFromRequest().get("key");
-
+    public static Result unignore(final String key) {
         IndexModel model = null;
         Notification n = new Notification();
 
@@ -340,7 +361,9 @@ public class MessagesController extends Controller {
 
         List<String> keys = new ArrayList<>();
         if (!StringUtils.isBlank(key)) {
-            keys.add(key);
+            if (messagesResource.loadIgnoreList().contains(key)) {
+                keys.add(key);
+            }
         } else {
             keys = messagesResource.loadIgnoreList();
         }
@@ -365,7 +388,7 @@ public class MessagesController extends Controller {
                     n.message = Messages.get("unignore.all.success", key);
                 }
             } catch (Exception e) {
-                n.message = Messages.get("unignore.error", e.getMessage());
+                n.message = Messages.get("unignore.error", key, e.getMessage());
                 n.notificationType = "error";
             }
         } else {
@@ -379,10 +402,12 @@ public class MessagesController extends Controller {
     /**
      * Gets all occurrences of the requested key in the source.
      * 
+     * @param key
+     *            The key to find in sources.
+     * 
      * @return Result with all source snippets.
      */
-    public static Result sources() {
-        String key = form().bindFromRequest().get("key");
+    public static Result sources(final String key) {
         SourceKeys sources = SourceKeys.lookUp();
         return ok(views.html.MessagesController.sources.render(sources, key));
     }

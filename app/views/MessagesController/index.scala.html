@@ -12,6 +12,7 @@
     <script src="@routes.Assets.at("javascripts/ColVis.min.js")" type="text/javascript"></script>
     <script src="@routes.Assets.at("javascripts/jquery.jeditable.js")" type="text/javascript"></script>
     <script src="@routes.Assets.at("javascripts/notify.js")" type="text/javascript"></script>
+    <script src="@routes.MessagesController.javascriptRoutes()" type="text/javascript"></script>
     <script src="@routes.Assets.at("javascripts/main.js")" type="text/javascript"></script>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
     <link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
@@ -19,19 +20,6 @@
     <link rel="stylesheet" href="@routes.Assets.at("stylesheets/main.css")">
     <link rel="stylesheet" href="@routes.Assets.at("stylesheets/notify.css")">
     <link rel="stylesheet" href="@routes.Assets.at("stylesheets/hint.css")">
-    <script type="text/javascript">
-    $(function() {
-        window.urls = {
-            deleteUrl: '@playmessages.routes.MessagesController.delete()',
-            keepUrl: '@playmessages.routes.MessagesController.keep()',
-            unkeepUrl: '@playmessages.routes.MessagesController.unkeep()',
-            ignoreUrl: '@playmessages.routes.MessagesController.ignore()',
-            unignoreUrl: '@playmessages.routes.MessagesController.unignore()',
-            saveUrl: '@playmessages.routes.MessagesController.save()',
-            sourcesUrl: '@playmessages.routes.MessagesController.sources()'
-        };
-    });
-    </script>
 </head>
 
 <body>

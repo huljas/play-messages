@@ -17,7 +17,7 @@
 <script type="text/javascript">
 
 function makejEditable(obj) {
-    obj.editable('@playmessages.routes.MessagesController.save()', {
+    obj.editable(jsRoutes.controllers.playmessages.MessagesController.save().url, {
         //type: "textarea",
         //cancel: "Cancel",
         //submit: "Save",

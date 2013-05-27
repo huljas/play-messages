@@ -1,6 +1,12 @@
+$(function() {
+	$(document).ajaxError(function(event, jqxhr, settings, exception) {
+		notify(jqxhr.statusText, "error");
+	});
+})
+
 function notify(msg, type) {
 	$.notify[type](msg, {
-		autoClose: 3000,
+		autoClose: 5000,
 		close: true
 	});
 }
@@ -18,87 +24,76 @@ function fnShowSources(key) {
     });
     $("#sources-target")
         .html('<div class="loading"></div>')
-        .load(window.urls.sourcesUrl, {
-            key:key
-        });
+        .load(jsRoutes.controllers.playmessages.MessagesController.sources(key).url);
+        
+    return false;
 }
 
 function fnDeleteKey(key) {
-    $.ajax(window.urls.deleteUrl, {
-        type: "POST",
-        data: {
-            key: key
-        }
-    }).done(function(msg) {
-		handleResult(msg);
-        if (msg.success) {
-            var oTable = $('#table').dataTable();
-            oTable.fnDeleteRow( $('#table tr[name="'+key+'"]').get(0) );
-        }
-    });
+	jsRoutes.controllers.playmessages.MessagesController.delete(key).ajax({
+		success: function(msg) {
+			handleResult(msg);
+			if (msg.success) {
+				var obj = $('#table tr[name="'+key+'"]').get(0);
+				$('#table').dataTable().fnDeleteRow( obj );
+			}
+		}
+	});
 }
 
 function fnKeepKey(key) {
-    $.ajax(window.urls.keepUrl, {
-        type: "POST",
-        data: {
-            key: key
-        }
-    }).done(function(msg) {
-		handleResult(msg);
-        if (msg.success) {
-            var obj = $('#table tr[name="'+key+'"]');
-            obj.removeClass("obsolete");
-            obj.addClass("keep");
-        }
+	jsRoutes.controllers.playmessages.MessagesController.keep(key).ajax({
+        success: function(msg) {
+			handleResult(msg);
+			if (msg.success) {
+				var obj = $('#table tr[name="'+key+'"]');
+				obj.removeClass("obsolete");
+				obj.addClass("keep");
+			}
+		}
     });
 }
 
 function fnUnkeepKey(key) {
-    $.ajax(window.urls.unkeepUrl, {
-        type: "POST",
-        data: {
-            key: key
-        }
-    }).done(function(msg) {
-		handleResult(msg);
-        if (msg.success) {
-            var obj = $('#table tr[name="'+key+'"]');
-            obj.removeClass("keep");
-            obj.addClass("obsolete");
-        }
+	jsRoutes.controllers.playmessages.MessagesController.unkeep(key).ajax({
+        success: function(msg) {
+			handleResult(msg);
+			if (msg.success) {
+				var obj = $('#table tr[name="'+key+'"]');
+				obj.removeClass("keep");
+				obj.addClass("obsolete");
+			}
+		}
     });
 }
 
 function fnIgnoreKey(key) {
-    $.ajax(window.urls.ignoreUrl, {
-        type: "POST",
-        data: {
-            key: key
-        }
-    }).done(function(msg) {
-		handleResult(msg);
-        if (msg.success) {
-            var oTable = $('#table').dataTable();
-            var obj = $('#table tr[name="'+key+'"]');
-            oTable.fnDeleteRow( obj.get(0) );
-        }
+	jsRoutes.controllers.playmessages.MessagesController.ignore(key).ajax({
+        success: function(msg) {
+			handleResult(msg);
+			if (msg.success) {
+				var obj = $('#table tr[name="'+key+'"]').get(0);
+				$('#table').dataTable().fnDeleteRow( obj );
+			}
+		}
     });
 }
 
 function fnUnignoreAll() {
-    $.ajax(window.urls.unignoreUrl, {
-        type: "POST",
-        data: {
-        }
-    }).done(function(msg) {
-		var obj = $(".notification-area");
-		obj.html(msg);
-		var oTable = $('#table').dataTable();
-		$.each($(".notification-area tr"), function(index, value) {
-			oTable.fnAddTr(value);
-		});
-		makejEditable(oTable.$('td.edit'));
+	return fnUnignore('');
+}
+
+function fnUnignore(key) {
+	jsRoutes.controllers.playmessages.MessagesController.unignore(key).ajax({
+        success: function(msg) {
+			var obj = $(".notification-area");
+			obj.html(msg);
+			var oTable = $('#table').dataTable();
+			$.each($(".notification-area tr"), function(index, value) {
+				oTable.fnAddTr(value);
+			});
+			makejEditable(oTable.$('td.edit'));
+		}
     });
 }
 
