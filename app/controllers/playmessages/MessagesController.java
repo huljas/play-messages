@@ -67,7 +67,7 @@ public class MessagesController extends Controller {
      * @return The localization file.
      */
     public static Result datatableI18n() {
-        return redirect(routes.Assets.at("/javascripts/i18n/datatable/"
+        return redirect(routes.Assets.at("javascripts/i18n/datatable/"
                 + lang().language() + ".js"));
     }
 
