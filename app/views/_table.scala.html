@@ -60,6 +60,9 @@ function makejEditable(obj) {
 
 $(document).ready(function() {
     var oTable = $('#table').dataTable({
+        oLanguage: {
+            sUrl: '@routes.MessagesController.datatableI18n()'
+        },
         bAutoWidth: false,
         iDisplayLength: 50,
         sDom: 'C<"clear">lfrtip',

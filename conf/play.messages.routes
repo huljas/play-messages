@@ -13,5 +13,6 @@ POST   /unkeep         controllers.playmessages.MessagesController.unkeep(key: S
 POST   /ignore         controllers.playmessages.MessagesController.ignore(key: String)
 POST   /unignore       controllers.playmessages.MessagesController.unignore(key: String)
 GET    /sources/:key   controllers.playmessages.MessagesController.sources(key: String)
+GET    /assets/javascripts/i18n/datatable controllers.playmessages.MessagesController.datatableI18n()
 GET    /assets/javascripts/routes controllers.playmessages.MessagesController.javascriptRoutes()
 GET    /assets/*file   controllers.playmessages.Assets.at(path="/public/playmessages", file)

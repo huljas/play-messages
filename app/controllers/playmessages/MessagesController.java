@@ -62,6 +62,16 @@ public class MessagesController extends Controller {
     }
 
     /**
+     * The localization file for the datatables plugin.
+     * 
+     * @return The localization file.
+     */
+    public static Result datatableI18n() {
+        return redirect(routes.Assets.at("/javascripts/i18n/datatable/"
+                + lang().language() + ".js"));
+    }
+
+    /**
      * Generates reverse routing for JavaScript.
      * 
      * @return JavaScript reverse routes.
