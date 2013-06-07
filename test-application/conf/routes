@@ -2,15 +2,13 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
+# play-messages
+->     /@messages       play.messages.Routes
+
 # Home page
-GET     /                                       LocalizedApplication.hello
-POST    /hello                                  LocalizedApplication.hello
-POST    /helloWithType                          LocalizedApplication.helloWithType
+GET    /                controllers.LocalizedApplication.hello()
+GET    /lang/:lang      controllers.LocalizedApplication.setLang(lang: String)
+POST   /helloWithType   controllers.LocalizedApplication.helloWithType()
 
-# Map static resources from the /app/public folder to the /public path
-GET     /public/                                staticDir:public
-
-*     /                       module:messages
-
-# Catch all
-*       /{controller}/{action}                  {controller}.{action}
+# Map static resources from the /public folder to the /assets URL path
+GET    /assets/*file    controllers.Assets.at(path="/public", file)

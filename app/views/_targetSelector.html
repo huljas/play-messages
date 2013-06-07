@@ -1,5 +1,0 @@
-<select class="language" data-selected="${language}">
-    #{list items:langs,as:'langOption'}
-        <option ${langOption == language ? "selected" : ""} data-href="@{index(langOption,defaultLanguage)}">${langOption}</option>
-    #{/list}
-</select>

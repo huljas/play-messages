@@ -1,21 +1,22 @@
-# Saved by @messages on Fri Mar 11 23:43:37 EET 2011
-changeLang=Vaihda kieli
-giveYourName=Anna nimesi
-happy=Iloinen\r\n
-hello.type.happy=Moi %s \!
-hello.type.loud=HEI %s \!\!\!
-hello.type.normal=Hei %s
-hello.type.quick=Moe\!
-loud=KOVAA
-normal=Perus
-quick=Nopee\!
-sayHello=Sano hei
-x.1aa1=xdasdad
-x.1aa2=KOVAA
-x.1aa4=Perus
-x.1aa5=Nopee\!
-x.1aa6=Sano hei
-x.1aa7=asdasdsda
-x.1aa8=x123
-x.1aaa=x piste 1 A A A 2222
-x.1aab=ö ÄÄÄÄ p ååå ÅÅÅÅ åå â ää
+# Saved by play-messages
+# Sun May 26 02:02:32 CEST 2013
+changeLang = Vaihda kieli
+giveYourName = Anna nimesi
+happy = Iloinen\r\n
+hello.type.happy = Moi {0} !
+hello.type.loud = HEI {0} !!!
+hello.type.normal = Hei {0}
+hello.type.quick = Moe!
+loud = KOVAA
+normal = Perus
+quick = Nopee!
+sayHello = Sano hei
+x.1aa1 = xdasdad
+x.1aa2 = KOVAA
+x.1aa4 = Perus
+x.1aa5 = Nopee!
+x.1aa6 = Sano hei
+x.1aa7 = asdasdsda
+x.1aa8 = x123
+x.1aaa = x piste 1 A A A 2222
+x.1aab = ö ÄÄÄÄ p ååå ÅÅÅÅ åå â ää

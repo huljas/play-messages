@@ -1,0 +1,31 @@
+@(key: String, value: List[Localization], model: IndexModel)
+
+<tr name="@key" class="@if(model.keepList.contains(key)) { keep } @if(model.newKeys.contains(key)) { new } else { @if(model.obsoleteKeys.contains(key)) { obsolete }}">
+    <td>
+        <a href="javascript:void(0)" onclick="fnUnkeepKey('@key')" class="btn-unkeep hint--top" data-hint="@Messages("index.unkeep")">
+            <span class="ui-icon ui-icon-pin-s"></span>
+        </a>
+        <a href="javascript:void(0)" onclick="fnKeepKey('@key')" class="btn-keep hint--top" data-hint="@Messages("index.keep")">
+            <span class="ui-icon ui-icon-pin-w"></span>
+        </a>
+        <a href="javascript:void(0)" onclick="fnIgnoreKey('@key')" class="btn-ignore hint--top" data-hint="@Messages("index.ignore")">
+            <span class="ui-icon ui-icon-close"></span>
+        </a>
+        <a href="javascript:void(0)" onclick="fnDeleteKey('@key')" class="btn-delete hint--top" data-hint="@Messages("index.delete")">
+            <span class="ui-icon ui-icon-trash"></span>
+        </a>
+        <a href="@routes.MessagesController.sources(key)" onclick="event.preventDefault(); fnShowSources('@key')" class="btn-sources hint--top" data-hint="@Messages("index.showusages", model.sources.getKeySourceList(key).listSourceFiles().size())">
+            <span class="ui-icon ui-icon-search"></span>
+        </a>
+        <span class="key">@key</span>
+    </td>
+@defining(value.groupBy(_.locale)) { curLocales => 
+@for(lkey <- model.langs){
+    @if(curLocales.contains(lkey)){
+        <td class="edit">@curLocales(lkey)(0).value</td>
+    }else{
+        <td class="edit @if(model.newKeys.contains(key)) { new } else { @if(model.obsoleteKeys.contains(key)) { obsolete } else { missing }}"></td>
+    }
+}
+}
+</tr>
